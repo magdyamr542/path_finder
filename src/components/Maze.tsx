@@ -112,7 +112,6 @@ export class Maze extends Component<Props, State> {
   // foreach cell in each row draw a cell component
   render() {
     let { rows } = this.state;
-    console.log(this);
 
     return (
       <>
