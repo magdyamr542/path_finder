@@ -1,15 +1,40 @@
 import React from "react";
 import "./styles/App.css";
 import { Maze } from "./components/Maze";
+import { MazeLegend } from "./components/MazeLegend";
+import { LegendItem } from "./interfaces/Maze.interface";
 
 function App() {
+  let cols = 20;
+  let rows = 20;
+  let cellDimension = 40;
+
+  let legendItems: LegendItem[];
+
+  legendItems = [
+    {
+      name: "Visited Node",
+      color: "red",
+    },
+
+    {
+      name: "Unvisited Node",
+      color: "white",
+    },
+    {
+      name: "Start Node",
+      color: "blue",
+    },
+  ];
+
   return (
     <div className="App">
+      <MazeLegend items={legendItems}></MazeLegend>
       <Maze
-        columnsNumber={20}
-        rowsNumber={20}
-        cellHeight={40}
-        cellWidth={40}
+        columnsNumber={cols}
+        rowsNumber={rows}
+        cellHeight={cellDimension}
+        cellWidth={cellDimension}
       ></Maze>
     </div>
   );

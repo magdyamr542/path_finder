@@ -13,3 +13,13 @@ export interface MouseEvents {
 export interface CellHashMap {
   [identifier: string]: CellComponent;
 }
+
+export interface LegendItem {
+  name: string;
+  color: string;
+}
+
+export interface SimpleRectInterface {
+  dims: number;
+  color: string;
+}
