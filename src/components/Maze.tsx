@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Cell, MouseEvents, CellHashMap } from "../interfaces/Maze.interface";
 import { Cell as CellComponent } from "./Cell";
 import { MouseStatus } from "../enums/enums";
+import { generateClassNameForCell } from "../utils/utils";
 
 interface Props {
   columnsNumber: number;
@@ -59,6 +60,7 @@ export class Maze extends Component<Props, State> {
   // generate the hash map for the cells after component renders
   componentDidUpdate() {
     this.cellHashMap = this.createCellsHashMap();
+    console.log(this.cellHashMap);
   }
 
   // check if you can color the cell and alert the child component to color it and change its state
@@ -66,8 +68,8 @@ export class Maze extends Component<Props, State> {
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     status: string
   ): boolean => {
-    if (status == MouseStatus.down) this.mouseEvents.down = true;
-    else if (status == MouseStatus.up) this.mouseEvents.down = false;
+    if (status === MouseStatus.down) this.mouseEvents.down = true;
+    else if (status === MouseStatus.up) this.mouseEvents.down = false;
     if (this.mouseEvents.down) {
       return true;
     }
@@ -83,13 +85,19 @@ export class Maze extends Component<Props, State> {
     }, map);
   };
 
-  // getting a cell component
+  // getting a cell component from the cells hashmap
   getReactCellComponent = (row: number, col: number): CellComponent => {
-    let cell: CellComponent = this.cellRefs.filter(
-      (cell: CellComponent) => cell.props.row == row && cell.props.col == col
-    )[0];
-    return cell;
+    let cellIdentifier: string = generateClassNameForCell(row, col);
+    return this.cellHashMap[cellIdentifier];
   };
+
+  // reseting the maze
+  resetMaze = (): void => {
+    Object.values(this.cellHashMap).forEach((cell: CellComponent) => {
+      cell.unVisitCell();
+    });
+  };
+
   // a template row consists of Cell Components that are rendered next to each other
   generateTemplateRow = (row: Cell[]) => {
     return row.map((cell: Cell, i: number) => {
@@ -98,11 +106,11 @@ export class Maze extends Component<Props, State> {
           row={cell.row}
           col={cell.col}
           free={cell.free}
-          key={`cell_${cell.row}_${cell.col}`}
+          key={generateClassNameForCell(cell.row, cell.col)}
           height={this.props.cellHeight}
           width={this.props.cellWidth}
           seeIfCanColorCell={this.seeIfCanColorCell}
-          identifier={`cell_${cell.row}_${cell.col}`}
+          identifier={generateClassNameForCell(cell.row, cell.col)}
           ref={(comp) => this.cellRefs.push(comp!)}
         ></CellComponent>
       );
@@ -115,6 +123,7 @@ export class Maze extends Component<Props, State> {
 
     return (
       <>
+        <button onClick={this.resetMaze}>Reset Maze</button>
         {rows.map((row: Cell[], i: number) => {
           return (
             <div key={`row row_${i}`} className={`row row_${i}`}>
