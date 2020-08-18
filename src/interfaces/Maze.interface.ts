@@ -3,3 +3,7 @@ export interface Cell {
   row: number;
   free: boolean;
 }
+
+export interface MouseEvents {
+  down: boolean;
+}

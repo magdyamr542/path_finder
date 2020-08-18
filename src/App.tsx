@@ -6,10 +6,10 @@ function App() {
   return (
     <div className="App">
       <Maze
-        columnsNumber={10}
-        rowsNumber={10}
-        cellHeight={50}
-        cellWidth={50}
+        columnsNumber={20}
+        rowsNumber={20}
+        cellHeight={40}
+        cellWidth={40}
       ></Maze>
     </div>
   );

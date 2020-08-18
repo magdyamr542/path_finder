@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { Cell } from "../interfaces/Maze.interface";
+import { Cell, MouseEvents } from "../interfaces/Maze.interface";
 import { Cell as CellComponent } from "./Cell";
+import { MouseStatus } from "../enums/enums";
 
 interface Props {
   columnsNumber: number;
@@ -14,6 +15,9 @@ interface State {
 }
 
 export class Maze extends Component<Props, State> {
+  mouseEvents: MouseEvents = {
+    down: false,
+  };
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -48,6 +52,18 @@ export class Maze extends Component<Props, State> {
     });
   }
 
+  test = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    status: string
+  ): boolean => {
+    if (status == MouseStatus.down) this.mouseEvents.down = true;
+    else if (status == MouseStatus.up) this.mouseEvents.down = false;
+    if (this.mouseEvents.down) {
+      return true;
+    }
+    return false;
+  };
+
   // a template row consists of Cell Components that are rendered next to each other
   generateTemplateRow = (row: Cell[]) => {
     return row.map((cell: Cell, i: number) => {
@@ -59,6 +75,7 @@ export class Maze extends Component<Props, State> {
           key={`cell_${cell.row}_${cell.col}`}
           height={this.props.cellHeight}
           width={this.props.cellWidth}
+          test={this.test}
         ></CellComponent>
       );
     });
