@@ -1,52 +1,38 @@
 import React, { Component } from "react";
 import { Cell as CellInterface } from "../interfaces/Maze.interface";
 import "../styles/Cell.css";
-import { MouseStatus } from "../enums/enums";
+import { MouseStatus, CellType } from "../enums/enums";
+import { generateClassNameForCell } from "../utils/utils";
 
-interface State {
-  free: boolean;
+interface CellState {
+  type: CellType;
+}
+// combine it with the CellState to set the color of the cell
+enum CellColor {
+  visited = "red",
+  unvisited = "white",
+  start = "blue",
 }
 
 interface CellProps extends CellInterface {
   width: number;
   height: number;
   identifier: string;
-  seeIfCanColorCell: (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    status: string
-  ) => boolean;
+  seeIfCanColorCell: (status: string) => boolean;
 }
 
-export class Cell extends Component<CellProps, State> {
+export class Cell extends Component<CellProps, CellState> {
+  prevMouseStatus: MouseStatus;
   constructor(props: CellProps) {
     super(props);
 
     this.state = {
-      free: true,
+      type: CellType.unvisited,
     };
-
-    this.handleClick = this.handleClick.bind(this);
+    this.prevMouseStatus = MouseStatus.move;
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.hanldeMouseUp = this.hanldeMouseUp.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
-  }
-
-  /* HANLDE MOUSE EVENTS*/
-  handleClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    let target = e.target;
-    if (this.state.free) {
-      this.setState({
-        free: false,
-      });
-    } else {
-      this.setState({
-        free: true,
-      });
-    }
-    this.setCellColor(
-      target as HTMLDivElement,
-      this.state.free ? "white" : "red"
-    );
   }
 
   setCellColor = (element: HTMLDivElement, color: string): void => {
@@ -54,30 +40,39 @@ export class Cell extends Component<CellProps, State> {
   };
 
   handleMouseDown(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    this.props.seeIfCanColorCell(e, MouseStatus.down);
-    this.setCellColor(e.target as HTMLDivElement, "red");
-    this.visitCell();
+    this.props.seeIfCanColorCell(MouseStatus.down);
+    this.prevMouseStatus = MouseStatus.down; // to notify mouse up that it is a click
+    if (this.state.type === CellType.unvisited) {
+      this.visitCell();
+    } else {
+      this.unVisitCell();
+    }
   }
 
+  isVisited = (): boolean => {
+    return this.state.type === CellType.visited;
+  };
+
   hanldeMouseUp(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    let res = this.props.seeIfCanColorCell(e, MouseStatus.up);
-    this.setCellColor(e.target as HTMLDivElement, "red");
-    this.visitCell();
+    this.props.seeIfCanColorCell(MouseStatus.up);
+    // if it is a click then state changing has been taken care of by the mouse down
+    if (this.prevMouseStatus === MouseStatus.down) {
+      return;
+    } else this.visitCell();
   }
 
   handleMouseMove(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    let canColor = this.props.seeIfCanColorCell(e, MouseStatus.move); // it returns true if the maze knows that the mouse is down. which means that user is curretnly selecting the maze
-    if (canColor) this.setCellColor(e.target as HTMLDivElement, "red");
+    let canColor = this.props.seeIfCanColorCell(MouseStatus.move); // it returns true if the maze knows that the mouse is down. which means that user is curretnly selecting the maze
     if (canColor) this.visitCell();
   }
 
   // mark the cell as visited
   visitCell = (): void => {
-    this.setState({ free: false });
+    this.setState({ type: CellType.visited });
   };
 
   unVisitCell = (): void => {
-    this.setState({ free: true });
+    this.setState({ type: CellType.unvisited });
   };
   render() {
     let styles = {
@@ -85,16 +80,18 @@ export class Cell extends Component<CellProps, State> {
       height: this.props.height,
       marginRight: "2px",
       cursor: "pointer",
-      backgroundColor: this.state.free ? "white" : "red",
+      backgroundColor: CellColor[this.state.type],
     };
 
     return (
       <div
-        onClick={this.handleClick}
         onMouseDown={this.handleMouseDown}
         onMouseMove={this.handleMouseMove}
         onMouseUp={this.hanldeMouseUp}
-        className={`cell cell_${this.props.row}_${this.props.col}`}
+        className={`cell ${generateClassNameForCell(
+          this.props.row,
+          this.props.col
+        )}`}
         style={styles}
       ></div>
     );

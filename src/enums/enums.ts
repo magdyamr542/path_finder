@@ -3,3 +3,9 @@ export enum MouseStatus {
   down = "down",
   move = "move",
 }
+
+export enum CellType {
+  start = "start",
+  visited = "visited",
+  unvisited = "unvisited",
+}

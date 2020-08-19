@@ -19,6 +19,8 @@ export class Maze extends Component<Props, State> {
   mouseEvents: MouseEvents = {
     down: false,
   };
+
+  prevMouseStatus: MouseStatus = MouseStatus.move;
   cellRefs: CellComponent[];
   cellHashMap: CellHashMap;
   constructor(props: Props) {
@@ -64,10 +66,7 @@ export class Maze extends Component<Props, State> {
   }
 
   // check if you can color the cell and alert the child component to color it and change its state
-  seeIfCanColorCell = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    status: string
-  ): boolean => {
+  seeIfCanColorCell = (status: string): boolean => {
     if (status === MouseStatus.down) this.mouseEvents.down = true;
     else if (status === MouseStatus.up) this.mouseEvents.down = false;
     if (this.mouseEvents.down) {
@@ -117,6 +116,7 @@ export class Maze extends Component<Props, State> {
     });
   };
 
+  pickStartNode = () => {};
   // foreach cell in each row draw a cell component
   render() {
     let { rows } = this.state;
@@ -124,6 +124,7 @@ export class Maze extends Component<Props, State> {
     return (
       <>
         <button onClick={this.resetMaze}>Reset Maze</button>
+        <button onClick={this.pickStartNode}>Pick a Start Node</button>
         {rows.map((row: Cell[], i: number) => {
           return (
             <div key={`row row_${i}`} className={`row row_${i}`}>
