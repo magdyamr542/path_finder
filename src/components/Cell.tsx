@@ -8,7 +8,6 @@ import {
   CellPickingMode,
 } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
-
 // combine it with the CellState to set the color of the cell
 
 interface CellState {
@@ -103,7 +102,6 @@ export class Cell extends Component<CellProps, CellState> {
       width: this.props.width,
       height: this.props.height,
       cursor: "pointer",
-      border: "2px solid black",
       marginRight: "1px",
       backgroundColor: CellColor[this.state.type],
     };

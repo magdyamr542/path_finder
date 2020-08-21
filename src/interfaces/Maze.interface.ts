@@ -1,9 +1,12 @@
 import { Cell as CellComponent } from "../components/Cell";
 
-export interface Cell {
-  col: number;
-  row: number;
+export interface Cell extends CellPosition {
   free: boolean;
+}
+
+export interface CellPosition {
+  row: number;
+  col: number;
 }
 
 export interface MouseEvents {
