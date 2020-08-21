@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Cell, MouseEvents, CellHashMap } from "../interfaces/Maze.interface";
 import { Cell as CellComponent } from "./Cell";
-import { MouseStatus } from "../enums/enums";
+import { MouseStatus, CellPickingMode } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
 
 interface Props {
@@ -112,30 +112,36 @@ export class Maze extends Component<Props, State> {
           seeIfCanColorCell={this.seeIfCanColorCell}
           identifier={generateClassNameForCell(cell.row, cell.col)}
           ref={(comp) => this.cellRefs.push(comp!)}
-          notifyParentWhenStartCellHasBeenClicked={
-            this.getNotifiedWhenStartCellIsPicked
+          notifyParentWhenCellWithSomeTypeHasBeenClicked={
+            this.getNotifiedWhenCellWithSomeTypeIsPicked
           }
         ></CellComponent>
       );
     });
   };
 
-  pickStartNode = () => {
+  pickCellWithSomeType = (type: CellPickingMode) => {
     // notify all the cells that picking start node mode is on
     Object.values(this.cellHashMap).forEach((cell: CellComponent) => {
       cell.setState({
-        startNodePickingMode: true,
+        cellPickingMode: type,
       });
     });
   };
 
-  getNotifiedWhenStartCellIsPicked = () => {
+  getNotifiedWhenCellWithSomeTypeIsPicked = () => {
     // notify all the cells that picking start node mode is off
-    Object.values(this.cellHashMap).forEach((cell: CellComponent) => [
-      cell.setState({
-        startNodePickingMode: false,
-      }),
-    ]);
+    Object.values(this.cellHashMap).forEach((cell: CellComponent) => {
+      if (cell.state.cellPickingMode !== CellPickingMode.normal) {
+        cell.setState({
+          cellPickingMode: CellPickingMode.normal,
+        });
+      }
+    });
+  };
+
+  startDFS = () => {
+    console.log("DFS Starting");
   };
   // foreach cell in each row draw a cell component
   render() {
@@ -144,7 +150,18 @@ export class Maze extends Component<Props, State> {
     return (
       <>
         <button onClick={this.resetMaze}>Reset Maze</button>
-        <button onClick={this.pickStartNode}>Pick a Start Node</button>
+        <button
+          onClick={() => this.pickCellWithSomeType(CellPickingMode.start)}
+        >
+          Pick a Start Node
+        </button>
+        <button
+          onClick={() => this.pickCellWithSomeType(CellPickingMode.target)}
+        >
+          Pick a target Node
+        </button>
+
+        <button onClick={this.startDFS}>Start A DFS</button>
 
         <div className="mazeContainer">
           {rows.map((row: Cell[], i: number) => {

@@ -1,19 +1,19 @@
 import React, { Component } from "react";
 import { Cell as CellInterface } from "../interfaces/Maze.interface";
 import "../styles/Cell.css";
-import { MouseStatus, CellType } from "../enums/enums";
+import {
+  MouseStatus,
+  CellType,
+  CellColor,
+  CellPickingMode,
+} from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
+
+// combine it with the CellState to set the color of the cell
 
 interface CellState {
   type: CellType;
-  startNodePickingMode: boolean;
-}
-
-// combine it with the CellState to set the color of the cell
-enum CellColor {
-  visited = "red",
-  unvisited = "white",
-  start = "blue",
+  cellPickingMode: CellPickingMode;
 }
 
 interface CellProps extends CellInterface {
@@ -21,18 +21,17 @@ interface CellProps extends CellInterface {
   height: number;
   identifier: string;
   seeIfCanColorCell: (status: string) => boolean;
-  notifyParentWhenStartCellHasBeenClicked: () => void;
+  notifyParentWhenCellWithSomeTypeHasBeenClicked: () => void;
 }
 
 export class Cell extends Component<CellProps, CellState> {
   prevMouseStatus: MouseStatus;
-  startNode: boolean = false;
   constructor(props: CellProps) {
     super(props);
 
     this.state = {
       type: CellType.unvisited,
-      startNodePickingMode: false,
+      cellPickingMode: CellPickingMode.normal,
     };
     this.prevMouseStatus = MouseStatus.move;
     this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -40,30 +39,20 @@ export class Cell extends Component<CellProps, CellState> {
     this.handleMouseMove = this.handleMouseMove.bind(this);
   }
 
-  setCellColor = (element: HTMLDivElement, color: string): void => {
-    element.style.backgroundColor = color;
-  };
-
   handleMouseDown(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     this.props.seeIfCanColorCell(MouseStatus.down);
     this.prevMouseStatus = MouseStatus.down; // to notify mouse up that it is a click
     // if this is the start node
-    if (this.state.startNodePickingMode) {
-      this.markAsStartNode();
+    if (this.state.cellPickingMode === CellPickingMode.start) {
+      this.markAsStartCell();
+      return;
+    } else if (this.state.cellPickingMode === CellPickingMode.target) {
+      this.markAsTargetCell();
       return;
     }
+
     if (this.state.type === CellType.unvisited) this.visitCell();
     else this.unVisitCell();
-  }
-
-  markAsStartNode() {
-    this.setState({
-      startNodePickingMode: true,
-      type: CellType.start,
-    });
-    this.startNode = true;
-    this.props.notifyParentWhenStartCellHasBeenClicked();
-    return;
   }
 
   hanldeMouseUp(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
@@ -76,8 +65,8 @@ export class Cell extends Component<CellProps, CellState> {
 
   handleMouseMove(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     let canColor = this.props.seeIfCanColorCell(MouseStatus.move); // it returns true if the maze knows that the mouse is down. which means that user is curretnly selecting the maze
-    if (canColor && this.state.type == CellType.visited) return;
-    if (canColor && !this.startNode) this.visitCell();
+    if (canColor && this.state.type !== CellType.unvisited) return;
+    if (canColor && this.state.type !== CellType.start) this.visitCell();
   }
 
   // mark the cell as visited
@@ -93,11 +82,27 @@ export class Cell extends Component<CellProps, CellState> {
     return this.state.type === CellType.visited;
   };
 
+  markAsStartCell() {
+    this.setState({
+      type: CellType.start,
+    });
+    this.props.notifyParentWhenCellWithSomeTypeHasBeenClicked();
+    return;
+  }
+
+  markAsTargetCell() {
+    this.setState({
+      type: CellType.target,
+    });
+    this.props.notifyParentWhenCellWithSomeTypeHasBeenClicked();
+    return;
+  }
+
   render() {
     let styles = {
       width: this.props.width,
       height: this.props.height,
-      marginRight: "2px",
+      marginRight: "1px",
       cursor: "pointer",
       backgroundColor: CellColor[this.state.type],
     };
