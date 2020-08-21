@@ -19,10 +19,11 @@ export class Maze extends Component<Props, State> {
   mouseEvents: MouseEvents = {
     down: false,
   };
-
   prevMouseStatus: MouseStatus = MouseStatus.move;
   cellRefs: CellComponent[];
   cellHashMap: CellHashMap;
+  pickingStartNode: boolean = false;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -111,12 +112,31 @@ export class Maze extends Component<Props, State> {
           seeIfCanColorCell={this.seeIfCanColorCell}
           identifier={generateClassNameForCell(cell.row, cell.col)}
           ref={(comp) => this.cellRefs.push(comp!)}
+          notifyParentWhenStartNodeHasBeenClicked={
+            this.getNotifiedWhenStartNodeIsPicked
+          }
         ></CellComponent>
       );
     });
   };
 
-  pickStartNode = () => {};
+  pickStartNode = () => {
+    // notify all the cells that picking start node mode is on
+    Object.values(this.cellHashMap).forEach((cell: CellComponent) => {
+      cell.setState({
+        startNodePickingMode: true,
+      });
+    });
+  };
+
+  getNotifiedWhenStartNodeIsPicked = () => {
+    // notify all the cells that picking start node mode is off
+    Object.values(this.cellHashMap).forEach((cell: CellComponent) => [
+      cell.setState({
+        startNodePickingMode: false,
+      }),
+    ]);
+  };
   // foreach cell in each row draw a cell component
   render() {
     let { rows } = this.state;
@@ -125,13 +145,16 @@ export class Maze extends Component<Props, State> {
       <>
         <button onClick={this.resetMaze}>Reset Maze</button>
         <button onClick={this.pickStartNode}>Pick a Start Node</button>
-        {rows.map((row: Cell[], i: number) => {
-          return (
-            <div key={`row row_${i}`} className={`row row_${i}`}>
-              {this.generateTemplateRow(row)}
-            </div>
-          );
-        })}
+
+        <div className="mazeContainer">
+          {rows.map((row: Cell[], i: number) => {
+            return (
+              <div key={`row row_${i}`} className={`row row_${i}`}>
+                {this.generateTemplateRow(row)}
+              </div>
+            );
+          })}
+        </div>
       </>
     );
   }
