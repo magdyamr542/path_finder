@@ -1,8 +1,10 @@
 .App {
   text-align: center;
-  margin-top: 10%;
+  margin-top: 5%;
+  margin-bottom: 5%;
 }
 
 .mazeContainer {
   font-size: 0;
+  margin: 30px;
 }
