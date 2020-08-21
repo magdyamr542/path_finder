@@ -112,8 +112,8 @@ export class Maze extends Component<Props, State> {
           seeIfCanColorCell={this.seeIfCanColorCell}
           identifier={generateClassNameForCell(cell.row, cell.col)}
           ref={(comp) => this.cellRefs.push(comp!)}
-          notifyParentWhenStartNodeHasBeenClicked={
-            this.getNotifiedWhenStartNodeIsPicked
+          notifyParentWhenStartCellHasBeenClicked={
+            this.getNotifiedWhenStartCellIsPicked
           }
         ></CellComponent>
       );
@@ -129,7 +129,7 @@ export class Maze extends Component<Props, State> {
     });
   };
 
-  getNotifiedWhenStartNodeIsPicked = () => {
+  getNotifiedWhenStartCellIsPicked = () => {
     // notify all the cells that picking start node mode is off
     Object.values(this.cellHashMap).forEach((cell: CellComponent) => [
       cell.setState({

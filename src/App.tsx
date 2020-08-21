@@ -25,6 +25,10 @@ function App() {
       name: "Start Node",
       color: "blue",
     },
+    {
+      name: "Target Node",
+      color: "green",
+    },
   ];
 
   return (

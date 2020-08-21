@@ -8,6 +8,7 @@ interface CellState {
   type: CellType;
   startNodePickingMode: boolean;
 }
+
 // combine it with the CellState to set the color of the cell
 enum CellColor {
   visited = "red",
@@ -20,7 +21,7 @@ interface CellProps extends CellInterface {
   height: number;
   identifier: string;
   seeIfCanColorCell: (status: string) => boolean;
-  notifyParentWhenStartNodeHasBeenClicked: () => void;
+  notifyParentWhenStartCellHasBeenClicked: () => void;
 }
 
 export class Cell extends Component<CellProps, CellState> {
@@ -61,7 +62,7 @@ export class Cell extends Component<CellProps, CellState> {
       type: CellType.start,
     });
     this.startNode = true;
-    this.props.notifyParentWhenStartNodeHasBeenClicked();
+    this.props.notifyParentWhenStartCellHasBeenClicked();
     return;
   }
 
@@ -75,6 +76,7 @@ export class Cell extends Component<CellProps, CellState> {
 
   handleMouseMove(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     let canColor = this.props.seeIfCanColorCell(MouseStatus.move); // it returns true if the maze knows that the mouse is down. which means that user is curretnly selecting the maze
+    if (canColor && this.state.type == CellType.visited) return;
     if (canColor && !this.startNode) this.visitCell();
   }
 
