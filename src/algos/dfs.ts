@@ -19,7 +19,7 @@ export class DFS {
     this.cellHashMap = cellHashmap;
     this.rows = rows - 1; // the mapping is from 0 to rows - 1
     this.cols = cols - 1;
-    this.animateResultSpeed = 30;
+    this.animateResultSpeed = 45;
   }
 
   animate = (result: DFSResult[]) => {
@@ -61,10 +61,12 @@ export class DFS {
     let start = this.filterForCell(CellType.start);
     let result: DFSResult[] = [];
     let targetCellFound: boolean = this.dfsUtil(start, target, cells, result);
-    if (targetCellFound) this.animate(result);
-    else {
+    if (targetCellFound) {
+      this.animate(result);
+      return true;
+    } else {
       this.animateResult(result);
-      console.log("Sorry There is Not Path");
+      return false;
     }
   };
 

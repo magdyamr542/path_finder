@@ -149,8 +149,7 @@ export class Maze extends Component<Props, State> {
     );
     let isReady: boolean = dfs.checkIfReadyToPerformDFS(); // it is ready if we have only one target and one start node
     if (isReady) {
-      console.log("Performing the DFS");
-      dfs.dfs();
+      let foundTargetCell = dfs.dfs();
     } else
       console.error(
         "Please make sure to start one Start Cell and One Target Cell"
