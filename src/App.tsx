@@ -13,21 +13,33 @@ function App() {
 
   legendItems = [
     {
-      name: "Visited Node",
+      name: "Visited Cell",
       color: "red",
     },
 
     {
-      name: "Unvisited Node",
+      name: "Unvisited Cell",
       color: "white",
     },
     {
-      name: "Start Node",
+      name: "Start Cell",
       color: "blue",
     },
     {
-      name: "Target Node",
+      name: "Target Cell",
       color: "green",
+    },
+    {
+      name: "DFS Path Cell",
+      color: "yellow",
+    },
+    {
+      name: "DFS Callback Cell",
+      color: "grey",
+    },
+    {
+      name: "DFS Actual Path Cell",
+      color: "pink",
     },
   ];
 

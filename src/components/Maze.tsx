@@ -1,15 +1,9 @@
 import React, { Component } from "react";
-import {
-  Cell,
-  MouseEvents,
-  CellHashMap,
-  CellPosition,
-} from "../interfaces/Maze.interface";
+import { Cell, MouseEvents, CellHashMap } from "../interfaces/Maze.interface";
 import { Cell as CellComponent } from "./Cell";
 import { MouseStatus, CellPickingMode } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
-import { checkIfReadyToPerformDFS } from "../algos/dfs";
-import { isArray } from "util";
+import { DFS } from "../algos/dfs";
 
 interface Props {
   columnsNumber: number;
@@ -148,9 +142,16 @@ export class Maze extends Component<Props, State> {
   };
 
   startDFS = () => {
-    let isReady: boolean = checkIfReadyToPerformDFS(this.cellHashMap); // it is ready if we have only one target and one start node
-    if (isReady) console.log("Ready  For dfs");
-    else
+    let dfs = new DFS(
+      this.cellHashMap,
+      this.props.rowsNumber,
+      this.props.columnsNumber
+    );
+    let isReady: boolean = dfs.checkIfReadyToPerformDFS(); // it is ready if we have only one target and one start node
+    if (isReady) {
+      console.log("Performing the DFS");
+      dfs.dfs();
+    } else
       console.error(
         "Please make sure to start one Start Cell and One Target Cell"
       );

@@ -39,7 +39,7 @@ export const MazeLegend = ({ items }: Props) => {
   let mazeLegendStyle = {
     display: "flex",
     justifyContent: "space-evenly",
-    margin: "25px 15%",
+    margin: "25px 5%",
   };
   return (
     <div className="mazeLegend" style={mazeLegendStyle}>

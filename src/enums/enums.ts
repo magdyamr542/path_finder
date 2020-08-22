@@ -9,6 +9,9 @@ export enum CellType {
   visited = "visited",
   unvisited = "unvisited",
   target = "target",
+  dfsPath = "dfsPath",
+  dfsReturnPath = "dfsReturnPath",
+  dfsResultPath = "dfsResultPath",
 }
 
 export enum CellColor {
@@ -16,6 +19,9 @@ export enum CellColor {
   unvisited = "white",
   start = "blue",
   target = "green",
+  dfsPath = "yellow",
+  dfsReturnPath = "grey",
+  dfsResultPath = "pink",
 }
 
 export enum CellPickingMode {
