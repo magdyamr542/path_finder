@@ -11,7 +11,7 @@ export enum CellType {
   target = "target",
   dfsPath = "dfsPath",
   dfsReturnPath = "dfsReturnPath",
-  dfsResultPath = "dfsResultPath",
+  bfsPath = "bfsPath",
 }
 
 export enum CellColor {
@@ -21,7 +21,7 @@ export enum CellColor {
   target = "green",
   dfsPath = "yellow",
   dfsReturnPath = "grey",
-  dfsResultPath = "pink",
+  bfsPath = "yellow",
 }
 
 export enum CellPickingMode {

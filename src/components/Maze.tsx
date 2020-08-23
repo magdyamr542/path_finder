@@ -4,6 +4,7 @@ import { Cell as CellComponent } from "./Cell";
 import { MouseStatus, CellPickingMode } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
 import { DFS } from "../algos/dfs";
+import { BFS } from "../algos/bfs";
 
 interface Props {
   columnsNumber: number;
@@ -147,9 +148,24 @@ export class Maze extends Component<Props, State> {
       this.props.rowsNumber,
       this.props.columnsNumber
     );
-    let isReady: boolean = dfs.checkIfReadyToPerformDFS(); // it is ready if we have only one target and one start node
+    let isReady: boolean = dfs.checkIfReadyToPerformPathFinding(); // it is ready if we have only one target and one start node
     if (isReady) {
       let foundTargetCell = dfs.dfs();
+    } else
+      console.error(
+        "Please make sure to start one Start Cell and One Target Cell"
+      );
+  };
+
+  startBFS = () => {
+    let bfs = new BFS(
+      this.cellHashMap,
+      this.props.rowsNumber,
+      this.props.columnsNumber
+    );
+    let isReady: boolean = bfs.checkIfReadyToPerformPathFinding(); // it is ready if we have only one target and one start node
+    if (isReady) {
+      bfs.bfs();
     } else
       console.error(
         "Please make sure to start one Start Cell and One Target Cell"
@@ -161,28 +177,31 @@ export class Maze extends Component<Props, State> {
 
     return (
       <>
-        <button onClick={this.resetMaze}>Reset Maze</button>
-        <button
-          onClick={() => this.pickCellWithSomeType(CellPickingMode.start)}
-        >
-          Pick a Start Node
-        </button>
-        <button
-          onClick={() => this.pickCellWithSomeType(CellPickingMode.target)}
-        >
-          Pick a target Node
-        </button>
+        <div className="maze">
+          <button onClick={this.resetMaze}>Reset Maze</button>
+          <button
+            onClick={() => this.pickCellWithSomeType(CellPickingMode.start)}
+          >
+            Pick a Start Node
+          </button>
+          <button
+            onClick={() => this.pickCellWithSomeType(CellPickingMode.target)}
+          >
+            Pick a target Node
+          </button>
 
-        <button onClick={this.startDFS}>Start A DFS</button>
+          <button onClick={this.startDFS}>Start A DFS</button>
+          <button onClick={this.startBFS}>Start A BFS</button>
 
-        <div className="mazeContainer">
-          {rows.map((row: Cell[], i: number) => {
-            return (
-              <div key={`row row_${i}`} className={`row row_${i}`}>
-                {this.generateTemplateRow(row)}
-              </div>
-            );
-          })}
+          <div className="mazeContainer">
+            {rows.map((row: Cell[], i: number) => {
+              return (
+                <div key={`row row_${i}`} className={`row row_${i}`}>
+                  {this.generateTemplateRow(row)}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </>
     );

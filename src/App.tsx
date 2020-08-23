@@ -5,7 +5,7 @@ import { MazeLegend } from "./components/MazeLegend";
 import { LegendItem } from "./interfaces/Maze.interface";
 
 function App() {
-  let cols = 20;
+  let cols = 30;
   let rows = 20;
   let cellDimension = 40;
 
@@ -37,21 +37,19 @@ function App() {
       name: "DFS Callback Cell",
       color: "grey",
     },
-    {
-      name: "DFS Actual Path Cell",
-      color: "pink",
-    },
   ];
 
   return (
     <div className="App">
       <MazeLegend items={legendItems}></MazeLegend>
-      <Maze
-        columnsNumber={cols}
-        rowsNumber={rows}
-        cellHeight={cellDimension}
-        cellWidth={cellDimension}
-      ></Maze>
+      <div className="mazeOuterContainer">
+        <Maze
+          columnsNumber={cols}
+          rowsNumber={rows}
+          cellHeight={cellDimension}
+          cellWidth={cellDimension}
+        ></Maze>
+      </div>
     </div>
   );
 }
