@@ -6,7 +6,7 @@ import { LegendItem } from "./interfaces/Maze.interface";
 
 function App() {
   let cols = 30;
-  let rows = 20;
+  let rows = 15;
   let cellDimension = 40;
 
   let legendItems: LegendItem[];
@@ -38,7 +38,7 @@ function App() {
       color: "grey",
     },
     {
-      name: "Shortes Result",
+      name: "Result",
       color: "pink",
     },
   ];
