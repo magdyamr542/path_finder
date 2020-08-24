@@ -10,12 +10,14 @@ export class DFS extends PathFinder {
     let target = this.filterForCell(CellType.target);
     let start = this.filterForCell(CellType.start);
     let result: DFSResult[] = [];
+    start.parent = { row: -1, col: -1 };
+    start.type = CellType.start;
     let targetCellFound: boolean = this.dfsUtil(start, target, cells, result);
     if (targetCellFound) {
-      this.animate(result);
+      this.animate(result, true);
       return true;
     } else {
-      this.animateResult(result);
+      this.animate(result, false);
       return false;
     }
   };
@@ -36,27 +38,33 @@ export class DFS extends PathFinder {
       result.push({
         row: current.row,
         col: current.col,
-        type: CellType.dfsPath,
+        type: CellType.target,
+        parent: current.parent,
       });
       return true;
     }
     // visit the cell
-    this.visitCell(current);
+    if (current.type !== CellType.start) this.visitCell(current);
     // push it to the result array for the first time
     result.push({
       row: current.row,
       col: current.col,
-      type: CellType.dfsPath,
+      type: current.type === CellType.start ? CellType.start : CellType.dfsPath,
+      parent: current.parent,
     });
     // visit all its neighbours
     for (let cell of this.getAdjacentCells(current, cells)) {
-      let found = this.dfsUtil(cell, target, cells, result);
-      if (found) return true;
+      if (cell.type === CellType.unvisited || cell.type === CellType.target) {
+        cell.parent = { row: current.row, col: current.col }; // set the parent of the cell
+        let found = this.dfsUtil(cell, target, cells, result);
+        if (found) return true;
+      }
     }
     result.push({
       row: current.row,
       col: current.col,
       type: CellType.dfsReturnPath,
+      parent: current.parent,
     });
     return false;
   };

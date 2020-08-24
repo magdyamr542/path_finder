@@ -13,29 +13,33 @@ function App() {
 
   legendItems = [
     {
-      name: "Visited Cell",
+      name: "Block",
       color: "red",
     },
 
     {
-      name: "Unvisited Cell",
+      name: "Free",
       color: "white",
     },
     {
-      name: "Start Cell",
+      name: "Start",
       color: "blue",
     },
     {
-      name: "Target Cell",
+      name: "Target",
       color: "green",
     },
     {
-      name: "DFS Path Cell",
+      name: "Current Path",
       color: "yellow",
     },
     {
-      name: "DFS Callback Cell",
+      name: "DFS Callback",
       color: "grey",
+    },
+    {
+      name: "Shortes Result",
+      color: "pink",
     },
   ];
 

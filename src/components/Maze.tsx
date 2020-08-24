@@ -150,7 +150,7 @@ export class Maze extends Component<Props, State> {
     );
     let isReady: boolean = dfs.checkIfReadyToPerformPathFinding(); // it is ready if we have only one target and one start node
     if (isReady) {
-      let foundTargetCell = dfs.dfs();
+      dfs.dfs();
     } else
       console.error(
         "Please make sure to start one Start Cell and One Target Cell"
@@ -165,7 +165,9 @@ export class Maze extends Component<Props, State> {
     );
     let isReady: boolean = bfs.checkIfReadyToPerformPathFinding(); // it is ready if we have only one target and one start node
     if (isReady) {
-      bfs.bfs();
+      let found = bfs.bfs();
+      if (found) console.log("Found");
+      else console.log("Didnt find");
     } else
       console.error(
         "Please make sure to start one Start Cell and One Target Cell"

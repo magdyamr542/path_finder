@@ -3,10 +3,15 @@ import { Cell } from "../components/Cell";
 import { CellType } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
 
+interface PathFinderResultParent {
+  row: number;
+  col: number;
+}
 export interface PathFinderResult {
   row: number;
   col: number;
   type: CellType;
+  parent: PathFinderResultParent;
 }
 export interface PathFinderCell extends PathFinderResult {}
 
@@ -21,24 +26,70 @@ export class PathFinder {
     this.cols = cols - 1;
   }
 
-  animate = (result: PathFinderResult[]) => {
-    this.animateResult(result);
+  animate = (result: PathFinderResult[], targetFound: boolean) => {
+    this.animateResult(result, targetFound).then((res) => {
+      if (targetFound) this.animateActualPath(result);
+    });
   };
 
-  animateResult = (result: PathFinderResult[]) => {
-    // for each cell on our way color it with yellow color for testing
-    console.log("The speed of animatin is", this.animateResultSpeed());
+  animateActualPath = (path: PathFinderResult[]) => {
+    let pathHashmap: { [x: string]: PathFinderResult } = path.reduce(
+      (made: { [x: string]: PathFinderResult }, current: PathFinderResult) => {
+        return {
+          ...made,
+          [generateClassNameForCell(current.row, current.col)]: current,
+        };
+      },
+      {}
+    );
+    let cells = Object.values(pathHashmap);
+    let target = cells.filter(
+      (cell: PathFinderResult, index: number) => cell.type === CellType.target
+    )[0];
 
-    for (let i = 1; i < result.length - 1; i++) {
-      let cell = result[i];
-      let actualCell = this.cellHashMap[
-        generateClassNameForCell(cell.row, cell.col)
+    let current =
+      pathHashmap[
+        generateClassNameForCell(target.parent.row, target.parent.col)
       ];
-      if (actualCell.state.type === CellType.start) continue;
-      setTimeout(() => {
-        actualCell.setState({ type: cell.type });
-      }, i * this.animateResultSpeed());
-    }
+
+    let timer = setInterval(() => {
+      if (
+        pathHashmap[
+          generateClassNameForCell(current.parent.row, current.parent.col)
+        ].type === CellType.start
+      ) {
+        clearInterval(timer);
+      }
+      let actualCell = this.cellHashMap[
+        generateClassNameForCell(current.row, current.col)
+      ];
+      current =
+        pathHashmap[
+          generateClassNameForCell(current.parent.row, current.parent.col)
+        ];
+      actualCell.setState({ type: CellType.actualPath });
+    }, this.animateResultSpeed());
+  };
+
+  animateResult = (
+    result: PathFinderResult[],
+    targetFound: boolean
+  ): Promise<number> => {
+    return new Promise<number>((resolve, reject) => {
+      // for each cell on our way color it with yellow color for testing
+      let endingCellNumber = targetFound ? result.length - 1 : result.length; // if not found then animate till end , if found then dont consider the target
+      for (let i = 1; i < endingCellNumber; i++) {
+        let cell = result[i];
+        let actualCell = this.cellHashMap[
+          generateClassNameForCell(cell.row, cell.col)
+        ];
+        if (actualCell.state.type === CellType.start) continue;
+        setTimeout(() => {
+          actualCell.setState({ type: cell.type });
+          if (i === endingCellNumber - 1) resolve(1);
+        }, i * this.animateResultSpeed());
+      }
+    });
   };
 
   generateCellsFromHashMap = (): PathFinderCell[][] => {
@@ -54,6 +105,7 @@ export class PathFinder {
           row: currentCell.props.row,
           col: currentCell.props.col,
           type: currentCell.state.type,
+          parent: { row: -1, col: -1 },
         });
       }
       cells.push(currentRow);
@@ -116,6 +168,7 @@ export class PathFinder {
       row: cell.props.row,
       col: cell.props.col,
       type: cell.state.type,
+      parent: { row: -1, col: -1 },
     };
   };
 

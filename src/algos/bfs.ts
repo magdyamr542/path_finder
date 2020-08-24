@@ -10,10 +10,14 @@ export class BFS extends PathFinder {
     let start = this.filterForCell(CellType.start);
     let target = this.filterForCell(CellType.target);
     let result: BFSResult[] = [];
-    let bfsResult: BFSResult[] = this.bfsUtil(start, target, cells, result);
-    console.log(bfsResult);
-    this.animate(result);
-    return true;
+    let cellFound: boolean = this.bfsUtil(start, target, cells, result);
+    if (cellFound) {
+      this.animate(result, true);
+      return true;
+    } else {
+      this.animate(result, false);
+      return false;
+    }
   };
 
   bfsUtil = (
@@ -21,23 +25,33 @@ export class BFS extends PathFinder {
     target: BFSCell,
     cells: BFSCell[][],
     result: BFSResult[] // empty array at the beginning
-  ): BFSResult[] => {
+  ): boolean => {
     let queue: BFSCell[] = []; // push the start node to the queue
+    start.type = CellType.start;
     queue.push(start);
     while (queue.length !== 0) {
       let current: BFSResult = queue.shift()!;
       if (current.type !== CellType.bfsPath) {
-        current.type = CellType.bfsPath;
+        if (current.type !== CellType.start) current.type = CellType.bfsPath; // set the bfs path cells if not the start cell
         result.push(current);
       }
-      if (this.isEqual(current, target)) return result; // if this is the target Cell then return true
+      if (this.isEqual(current, target)) {
+        current.type = CellType.target; // if target then change its type
+        return true;
+      } // if this is the target Cell then return true
+
       // if not then visit  all its neighbours which have not been visited yet
       for (let cell of this.getAdjacentCells(current, cells)) {
-        if (cell.type !== CellType.bfsPath && cell.type !== CellType.visited) {
+        if (
+          cell.type !== CellType.bfsPath &&
+          cell.type !== CellType.visited &&
+          cell.type !== CellType.start
+        ) {
+          cell.parent = { row: current.row, col: current.col };
           queue.push(cell);
         }
       }
     }
-    return result;
+    return false;
   };
 }
