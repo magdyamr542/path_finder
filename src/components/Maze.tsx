@@ -5,6 +5,7 @@ import { MouseStatus, CellPickingMode } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
 import { DFS } from "../algos/dfs";
 import { BFS } from "../algos/bfs";
+import "../styles/Maze.css";
 
 interface Props {
   columnsNumber: number;
@@ -180,20 +181,33 @@ export class Maze extends Component<Props, State> {
     return (
       <>
         <div className="maze">
-          <button onClick={this.resetMaze}>Reset Maze</button>
-          <button
-            onClick={() => this.pickCellWithSomeType(CellPickingMode.start)}
-          >
-            Pick a Start Node
-          </button>
-          <button
-            onClick={() => this.pickCellWithSomeType(CellPickingMode.target)}
-          >
-            Pick a target Node
-          </button>
+          <div className="button-container-pick">
+            <button
+              className="button start"
+              onClick={() => this.pickCellWithSomeType(CellPickingMode.start)}
+            >
+              Pick a Start Cell
+            </button>
+            <button onClick={this.resetMaze} className="button reset">
+              Reset Maze
+            </button>
 
-          <button onClick={this.startDFS}>Start A DFS</button>
-          <button onClick={this.startBFS}>Start A BFS</button>
+            <button
+              className="button target"
+              onClick={() => this.pickCellWithSomeType(CellPickingMode.target)}
+            >
+              Pick a target Cell
+            </button>
+          </div>
+
+          <div className="button-container-search">
+            <button onClick={this.startDFS} className="button dfs">
+              Start A DFS
+            </button>
+            <button onClick={this.startBFS} className="button bfs">
+              Start A BFS
+            </button>
+          </div>
 
           <div className="mazeContainer">
             {rows.map((row: Cell[], i: number) => {
