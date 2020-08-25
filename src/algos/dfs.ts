@@ -12,7 +12,11 @@ export class DFS extends PathFinder {
     let result: DFSResult[] = [];
     start.parent = { row: -1, col: -1 };
     start.type = CellType.start;
+    let timeStart = performance.now();
     let targetCellFound: boolean = this.dfsUtil(start, target, cells, result);
+    let timeEnd = performance.now();
+    console.log("The time for dfs in seconds is ", timeEnd / timeStart / 1000);
+    console.log("RESULT DFS", result);
     if (targetCellFound) {
       this.animate(result, true);
       return true;
