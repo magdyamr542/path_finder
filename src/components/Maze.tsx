@@ -19,6 +19,9 @@ interface State {
 }
 
 export class Maze extends Component<Props, State> {
+  dfs: DFS;
+  bfs: BFS;
+
   mouseEvents: MouseEvents = {
     down: false,
   };
@@ -34,6 +37,8 @@ export class Maze extends Component<Props, State> {
     };
     this.cellRefs = [];
     this.cellHashMap = {};
+    this.dfs = new DFS(this.cellHashMap, props.rowsNumber, props.columnsNumber);
+    this.bfs = new BFS(this.cellHashMap, props.rowsNumber, props.columnsNumber);
   }
 
   // generating the cells
@@ -144,14 +149,10 @@ export class Maze extends Component<Props, State> {
   };
 
   startDFS = () => {
-    let dfs = new DFS(
-      this.cellHashMap,
-      this.props.rowsNumber,
-      this.props.columnsNumber
-    );
-    let isReady: boolean = dfs.checkIfReadyToPerformPathFinding(); // it is ready if we have only one target and one start node
+    this.dfs.cellHashmap(this.cellHashMap);
+    let isReady: boolean = this.dfs.checkIfReadyToPerformPathFinding(); // it is ready if we have only one target and one start node
     if (isReady) {
-      dfs.dfs();
+      this.dfs.dfs();
     } else
       console.error(
         "Please make sure to start one Start Cell and One Target Cell"
@@ -159,14 +160,10 @@ export class Maze extends Component<Props, State> {
   };
 
   startBFS = () => {
-    let bfs = new BFS(
-      this.cellHashMap,
-      this.props.rowsNumber,
-      this.props.columnsNumber
-    );
-    let isReady: boolean = bfs.checkIfReadyToPerformPathFinding(); // it is ready if we have only one target and one start node
+    this.bfs.cellHashmap(this.cellHashMap);
+    let isReady: boolean = this.bfs.checkIfReadyToPerformPathFinding(); // it is ready if we have only one target and one start node
     if (isReady) {
-      let found = bfs.bfs();
+      let found = this.bfs.bfs();
       if (found) console.log("Found");
       else console.log("Didnt find");
     } else

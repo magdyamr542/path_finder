@@ -16,14 +16,23 @@ export interface PathFinderResult {
 export interface PathFinderCell extends PathFinderResult {}
 
 export class PathFinder {
-  cellHashMap: CellHashMap;
+  _cellHashMap: CellHashMap;
   rows: number;
   cols: number;
   _animateResultSpeed: number = 50;
   constructor(cellHashmap: CellHashMap, rows: number, cols: number) {
-    this.cellHashMap = cellHashmap;
+    this._cellHashMap = cellHashmap;
     this.rows = rows - 1; // the mapping is from 0 to rows - 1
     this.cols = cols - 1;
+  }
+
+  // getting and setting the set hash map
+  cellHashmap(): CellHashMap;
+  cellHashmap(cellhashmap: CellHashMap): this;
+  cellHashmap(cellhashmap?: CellHashMap): this | CellHashMap {
+    if (!arguments.length) return this._cellHashMap;
+    this._cellHashMap = cellhashmap!;
+    return this;
   }
 
   animate = (result: PathFinderResult[], targetFound: boolean) => {
@@ -60,9 +69,9 @@ export class PathFinder {
       ) {
         clearInterval(timer);
       }
-      let actualCell = this.cellHashMap[
-        generateClassNameForCell(current.row, current.col)
-      ];
+      let cellHashMap = this.cellHashmap();
+      let actualCell =
+        cellHashMap[generateClassNameForCell(current.row, current.col)];
       current =
         pathHashmap[
           generateClassNameForCell(current.parent.row, current.parent.col)
@@ -80,9 +89,9 @@ export class PathFinder {
       let endingCellNumber = targetFound ? result.length - 1 : result.length; // if not found then animate till end , if found then dont consider the target
       for (let i = 1; i < endingCellNumber; i++) {
         let cell = result[i];
-        let actualCell = this.cellHashMap[
-          generateClassNameForCell(cell.row, cell.col)
-        ];
+        let cellHashMap = this.cellHashmap();
+        let actualCell =
+          cellHashMap[generateClassNameForCell(cell.row, cell.col)];
         if (actualCell.state.type === CellType.start) continue;
         setTimeout(() => {
           actualCell.setState({ type: cell.type });
@@ -94,13 +103,12 @@ export class PathFinder {
 
   generateCellsFromHashMap = (): PathFinderCell[][] => {
     let cells = [];
+    let cellHashMap = this.cellHashmap();
     // push the rows
     for (let i = 0; i <= this.rows; i++) {
       let currentRow: PathFinderCell[] = [];
       for (let j = 0; j <= this.cols; j++) {
-        let currentCell: Cell = this.cellHashMap[
-          generateClassNameForCell(i, j)
-        ];
+        let currentCell: Cell = cellHashMap[generateClassNameForCell(i, j)];
         currentRow.push({
           row: currentCell.props.row,
           col: currentCell.props.col,
@@ -115,10 +123,11 @@ export class PathFinder {
 
   // pre proccessing to see if there is one target and one source node or nor
   checkIfReadyToPerformPathFinding = (): boolean => {
-    let target = Object.values(this.cellHashMap).filter(
+    let cellHashMap = this.cellHashmap();
+    let target = Object.values(cellHashMap).filter(
       (cell: Cell) => cell.state.type === CellType.target
     );
-    let start = Object.values(this.cellHashMap).filter(
+    let start = Object.values(cellHashMap).filter(
       (cell: Cell) => cell.state.type === CellType.start
     );
     return target.length === 1 && start.length === 1;
@@ -161,7 +170,8 @@ export class PathFinder {
   };
 
   filterForCell = (type: CellType): PathFinderCell => {
-    let cell = Object.values(this.cellHashMap).filter(
+    let cellHashMap = this.cellHashmap();
+    let cell = Object.values(cellHashMap).filter(
       (cell: Cell) => cell.state.type === type
     )[0];
     return {

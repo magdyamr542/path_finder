@@ -6,7 +6,7 @@ import { LegendItem } from "./interfaces/Maze.interface";
 
 function App() {
   let cols = 30;
-  let rows = 15;
+  let rows = 30;
   let cellDimension = 40;
 
   let legendItems: LegendItem[];

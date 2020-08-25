@@ -42,11 +42,7 @@ export class BFS extends PathFinder {
 
       // if not then visit  all its neighbours which have not been visited yet
       for (let cell of this.getAdjacentCells(current, cells)) {
-        if (
-          cell.type !== CellType.bfsPath &&
-          cell.type !== CellType.visited &&
-          cell.type !== CellType.start
-        ) {
+        if (cell.type === CellType.unvisited || cell.type === CellType.target) {
           cell.parent = { row: current.row, col: current.col };
           queue.push(cell);
         }

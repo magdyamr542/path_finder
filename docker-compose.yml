@@ -1,8 +1,7 @@
 version: "3.7"
 
 services:
-  path_finder:
-    container_name: path_finder
+  path_finder:    
     tty: true
     build:
       context: .
