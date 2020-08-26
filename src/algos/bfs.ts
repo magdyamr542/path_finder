@@ -11,11 +11,7 @@ export class BFS extends PathFinder {
     let start = this.filterForCell(CellType.start);
     let target = this.filterForCell(CellType.target);
     let result: BFSResult[] = [];
-    let timeStart = performance.now();
     let cellFound: boolean = this.bfsUtil(start, target, cells, result);
-    let timeEnd = performance.now();
-    console.log("The time for bfs in seconds is ", timeEnd / timeStart / 1000);
-    console.log("RESULT BFS", result);
 
     if (cellFound) {
       this.animate(result, true);

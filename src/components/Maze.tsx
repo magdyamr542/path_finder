@@ -5,6 +5,7 @@ import { MouseStatus, CellPickingMode } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
 import { DFS } from "../algos/dfs";
 import { BFS } from "../algos/bfs";
+import { BidirectionalBFS } from "../algos/BidirectionalBfs";
 import "../styles/Maze.css";
 
 interface Props {
@@ -21,6 +22,7 @@ interface State {
 export class Maze extends Component<Props, State> {
   dfs: DFS;
   bfs: BFS;
+  bidirectionalBfs: BidirectionalBFS;
 
   mouseEvents: MouseEvents = {
     down: false,
@@ -39,6 +41,11 @@ export class Maze extends Component<Props, State> {
     this.cellHashMap = {};
     this.dfs = new DFS(this.cellHashMap, props.rowsNumber, props.columnsNumber);
     this.bfs = new BFS(this.cellHashMap, props.rowsNumber, props.columnsNumber);
+    this.bidirectionalBfs = new BidirectionalBFS(
+      this.cellHashMap,
+      props.rowsNumber,
+      props.columnsNumber
+    );
   }
 
   // generating the cells
@@ -171,6 +178,19 @@ export class Maze extends Component<Props, State> {
         "Please make sure to start one Start Cell and One Target Cell"
       );
   };
+
+  StartBidirectionalBFS = () => {
+    this.bidirectionalBfs.cellHashmap(this.cellHashMap);
+    let isReady: boolean = this.bidirectionalBfs.checkIfReadyToPerformPathFinding(); // it is ready if we have only one target and one start node
+    if (isReady) {
+      let found = this.bidirectionalBfs.bfs();
+      if (found) console.log("Found");
+      else console.log("Didnt find");
+    } else
+      console.error(
+        "Please make sure to start one Start Cell and One Target Cell"
+      );
+  };
   // foreach cell in each row draw a cell component
   render() {
     let { rows } = this.state;
@@ -199,10 +219,16 @@ export class Maze extends Component<Props, State> {
 
           <div className="button-container-search">
             <button onClick={this.startDFS} className="button dfs">
-              Start A DFS
+              DFS
             </button>
             <button onClick={this.startBFS} className="button bfs">
-              Start A BFS
+              BFS
+            </button>
+            <button
+              onClick={this.StartBidirectionalBFS}
+              className="button bd-bfs"
+            >
+              Bidirectional BFS
             </button>
           </div>
 

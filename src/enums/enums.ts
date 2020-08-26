@@ -13,6 +13,7 @@ export enum CellType {
   dfsReturnPath = "dfsReturnPath",
   bfsPath = "bfsPath",
   actualPath = "actualPath",
+  bfsConnect = "bfsConnect",
 }
 
 export enum CellColor {
@@ -24,6 +25,7 @@ export enum CellColor {
   dfsReturnPath = "grey",
   bfsPath = "yellow",
   actualPath = "pink",
+  bfsConnect = "grey",
 }
 
 export enum CellPickingMode {
