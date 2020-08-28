@@ -22,8 +22,7 @@ export class BidirectionalBFS extends PathFinder {
       resultStart,
       resultTarget
     );
-    console.log(resultStart, resultTarget);
-    this._animate(resultStart, resultTarget, cells);
+    this._animate(resultStart, resultTarget, cells, cellFound);
     return cellFound;
   };
 
@@ -120,7 +119,8 @@ export class BidirectionalBFS extends PathFinder {
   _animate = (
     resultStart: PathFinderResult[],
     resultTarget: PathFinderResult[],
-    cells: PathFinderCell[][]
+    cells: PathFinderCell[][],
+    targetFound: boolean
   ) => {
     // get the connecting point
     let connect = resultStart.filter((c) => c.type === CellType.bfsConnect);
@@ -140,6 +140,7 @@ export class BidirectionalBFS extends PathFinder {
       this.cellHashmap(),
       this.animateResultSpeed()
     ).then((res) => {
+      if (!targetFound) return;
       let pathFromConnectToStart = this._getPathFromConnectToStart(
         connect,
         cells,
