@@ -2,6 +2,7 @@ import { CellHashMap } from "../interfaces/Maze.interface";
 import { Cell } from "../components/Cell";
 import { CellType } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
+import { animateResult } from "../animators/animator";
 
 interface PathFinderResultParent {
   row: number;
@@ -13,6 +14,8 @@ export interface PathFinderResult {
   type: CellType;
   parent: PathFinderResultParent;
 }
+
+export type PathHashMap = { [x: string]: PathFinderResult };
 export interface PathFinderCell extends PathFinderResult {}
 
 export class PathFinder {
@@ -36,9 +39,54 @@ export class PathFinder {
   }
 
   animate = (result: PathFinderResult[], targetFound: boolean) => {
-    this.animateResult(result, targetFound).then((res) => {
-      if (targetFound) this.animateActualPath(result);
+    let resultToAnimate = result.filter(
+      (c) => c.type !== CellType.start && c.type !== CellType.target
+    );
+    animateResult(
+      resultToAnimate,
+      this.cellHashmap(),
+      this.animateResultSpeed()
+    ).then((res) => {
+      let actualPath = this.constructActualPath(result);
+      if (targetFound)
+        animateResult(
+          actualPath,
+          this.cellHashmap(),
+          this.animateResultSpeed()
+        );
     });
+  };
+
+  constructActualPath = (path: PathFinderResult[]): PathFinderResult[] => {
+    let actualPath: PathFinderResult[] = [];
+    let pathHashmap: PathHashMap = path.reduce(
+      (made: { [x: string]: PathFinderResult }, current: PathFinderResult) => {
+        return {
+          ...made,
+          [generateClassNameForCell(current.row, current.col)]: current,
+        };
+      },
+      {}
+    );
+    // get the target cell
+    let cells = Object.values(pathHashmap);
+    let target = cells.filter(
+      (cell: PathFinderResult, index: number) => cell.type === CellType.target
+    )[0];
+    // from the target cell construct the path till you reach the start cell
+    let current =
+      pathHashmap[
+        generateClassNameForCell(target.parent.row, target.parent.col)
+      ];
+    while (current.type !== CellType.start) {
+      current.type = CellType.actualPath;
+      actualPath.push(current);
+      current =
+        pathHashmap[
+          generateClassNameForCell(current.parent.row, current.parent.col)
+        ];
+    }
+    return actualPath;
   };
 
   animateActualPath = (path: PathFinderResult[]) => {

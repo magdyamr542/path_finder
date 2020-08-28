@@ -3,9 +3,9 @@ import { PathFinder, PathFinderCell, PathFinderResult } from "./pathFinder";
 import { Queue } from "../datastructures/queue";
 import { generateClassNameForCell } from "../utils/utils";
 
-interface BFSResult extends PathFinderResult {}
-interface BFSCell extends PathFinderCell {}
-interface BFSCellHashmap {
+export interface BFSResult extends PathFinderResult {}
+export interface BFSCell extends PathFinderCell {}
+export interface BFSCellHashmap {
   [key: string]: BFSCell;
 }
 export class BidirectionalBFS extends PathFinder {
@@ -23,77 +23,9 @@ export class BidirectionalBFS extends PathFinder {
       resultStart,
       resultTarget
     );
-
     this._animate(resultStart, resultTarget, cellFound, cells);
-
     return cellFound;
   };
-
-  _animate = (
-    resultStart: PathFinderResult[],
-    resultTarget: PathFinderResult[],
-    targetFound: boolean,
-    cells: PathFinderCell[][]
-  ) => {
-    // get the connecting point
-    let connectInStart = true;
-    let connect = resultStart.filter((c) => c.type === CellType.bfsConnect);
-    if (connect.length === 0) {
-      connectInStart = false;
-      connect = resultTarget.filter((c) => c.type === CellType.bfsConnect);
-    }
-    // call the animator for both parts
-    this._animateResult(resultStart, targetFound);
-    this._animateResult(resultTarget, targetFound);
-    this._animatePathFromConnectToStart(connect, cells, resultStart);
-    this._animatePathFromConnectToEnd(connect, cells, resultTarget);
-  };
-
-  _animatePathFromConnectToStart(
-    connect: PathFinderResult[],
-    cells: PathFinderCell[][],
-    resultStart: PathFinderResult[]
-  ) {
-    // get all ajacent cells of the connect cell which are in the targetStart array
-    let connectAdjCells = this.getAdjacentCells(connect[0], cells);
-    let cellInStartWhichIsAdjToConnectCell: PathFinderCell;
-    connectAdjCells.forEach((adjCell) => {
-      if (
-        resultStart.find((c) => c.row === adjCell.row && c.col === adjCell.col)
-      )
-        cellInStartWhichIsAdjToConnectCell = adjCell;
-    });
-    let startConnect: PathFinderResult = Object.assign({}, connect[0]);
-    startConnect.parent = {
-      row: cellInStartWhichIsAdjToConnectCell.row,
-      col: cellInStartWhichIsAdjToConnectCell.col,
-    };
-    resultStart.push(startConnect);
-    console.log(this, resultStart);
-  }
-
-  _animatePathFromConnectToEnd(
-    connect: PathFinderResult[],
-    cells: PathFinderCell[][],
-    resultTarget: PathFinderResult[]
-  ) {
-    // get all ajacent cells of the connect cell which are in the targetStart array
-    let connectAdjCells = this.getAdjacentCells(connect[0], cells);
-    let cellInEndWhichIsAdjToConnectCell: PathFinderCell;
-    connectAdjCells.forEach((adjCell) => {
-      if (
-        resultTarget.find((c) => c.row === adjCell.row && c.col === adjCell.col)
-      )
-        cellInEndWhichIsAdjToConnectCell = adjCell;
-    });
-    let startConnect: PathFinderResult = Object.assign({}, connect[0]);
-    startConnect.parent = {
-      row: cellInEndWhichIsAdjToConnectCell.row,
-      col: cellInEndWhichIsAdjToConnectCell.col,
-    };
-    resultTarget.push(startConnect);
-    console.log(this, resultTarget);
-  }
 
   bfsUtil = (
     start: BFSCell,
@@ -157,8 +89,8 @@ export class BidirectionalBFS extends PathFinder {
   ) {
     if (!currentQueue.isEmpty()) {
       let currentCell = currentQueue.dequeue();
-      if (currentCell.type == CellType.visited) return false;
-      if (currentCell.type == CellType.unvisited) {
+      if (currentCell.type === CellType.visited) return false;
+      if (currentCell.type === CellType.unvisited) {
         currentCell.type = CellType.bfsPath;
         result.push(currentCell);
       }
@@ -175,6 +107,9 @@ export class BidirectionalBFS extends PathFinder {
             adjCell.type !== CellType.bfsPath &&
             adjCell.type !== CellType.visited
           ) {
+            this.cellHashmap()[
+              generateClassNameForCell(adjCell.row, adjCell.col)
+            ].setState({ type: CellType.bfsPath });
             adjCell.parent = { row: currentCell.row, col: currentCell.col };
             currentQueue.enqueue(adjCell);
             this.addToCellhashmap(visitedFromThisSide, adjCell);
@@ -185,7 +120,81 @@ export class BidirectionalBFS extends PathFinder {
     return false;
   }
 
-  _animatePathFromStart = (path: PathFinderResult[]) => {
+  _animate = (
+    resultStart: PathFinderResult[],
+    resultTarget: PathFinderResult[],
+    targetFound: boolean,
+    cells: PathFinderCell[][]
+  ) => {
+    // get the connecting point
+    let connectInStart = true;
+    let connect = resultStart.filter((c) => c.type === CellType.bfsConnect);
+    if (connect.length === 0) {
+      connectInStart = false;
+      connect = resultTarget.filter((c) => c.type === CellType.bfsConnect);
+    }
+
+    // call the animator for both parts
+    this._animateResultWithPromise(resultStart).then((res) => {
+      this._animateResultWithPromise(resultTarget).then((res) => {
+        this._animatePathFromConnectToStart(
+          connect,
+          cells,
+          resultStart
+        ).then((res) =>
+          this._animatePathFromConnectToEnd(connect, cells, resultTarget)
+        );
+      });
+    });
+  };
+
+  _animatePathFromConnectToStart(
+    connect: PathFinderResult[],
+    cells: PathFinderCell[][],
+    resultStart: PathFinderResult[]
+  ): Promise<boolean> {
+    // get all ajacent cells of the connect cell which are in the targetStart array
+    let connectAdjCells = this.getAdjacentCells(connect[0], cells);
+    let cellInStartWhichIsAdjToConnectCell: PathFinderCell;
+    connectAdjCells.forEach((adjCell) => {
+      if (
+        resultStart.find((c) => c.row === adjCell.row && c.col === adjCell.col)
+      )
+        cellInStartWhichIsAdjToConnectCell = adjCell;
+    });
+    let startConnect: PathFinderResult = Object.assign({}, connect[0]);
+    startConnect.parent = {
+      row: cellInStartWhichIsAdjToConnectCell.row,
+      col: cellInStartWhichIsAdjToConnectCell.col,
+    };
+    resultStart.push(startConnect);
+    return this._animatePathFromStart(resultStart);
+  }
+
+  _animatePathFromConnectToEnd(
+    connect: PathFinderResult[],
+    cells: PathFinderCell[][],
+    resultTarget: PathFinderResult[]
+  ) {
+    // get all ajacent cells of the connect cell which are in the targetStart array
+    let connectAdjCells = this.getAdjacentCells(connect[0], cells);
+    let cellInEndWhichIsAdjToConnectCell: PathFinderCell;
+    connectAdjCells.forEach((adjCell) => {
+      if (
+        resultTarget.find((c) => c.row === adjCell.row && c.col === adjCell.col)
+      )
+        cellInEndWhichIsAdjToConnectCell = adjCell;
+    });
+    let startConnect: PathFinderResult = Object.assign({}, connect[0]);
+    startConnect.parent = {
+      row: cellInEndWhichIsAdjToConnectCell.row,
+      col: cellInEndWhichIsAdjToConnectCell.col,
+    };
+    resultTarget.push(startConnect);
+    this._animatePathFromEnd(resultTarget);
+  }
+
+  _animatePathFromStart = (path: PathFinderResult[]): Promise<boolean> => {
     let pathHashmap: { [x: string]: PathFinderResult } = path.reduce(
       (made: { [x: string]: PathFinderResult }, current: PathFinderResult) => {
         return {
@@ -206,23 +215,26 @@ export class BidirectionalBFS extends PathFinder {
         generateClassNameForCell(target.parent.row, target.parent.col)
       ];
 
-    let timer = setInterval(() => {
-      if (
-        pathHashmap[
-          generateClassNameForCell(current.parent.row, current.parent.col)
-        ].type === CellType.start
-      ) {
-        clearInterval(timer);
-      }
-      let cellHashMap = this.cellHashmap();
-      let actualCell =
-        cellHashMap[generateClassNameForCell(current.row, current.col)];
-      current =
-        pathHashmap[
-          generateClassNameForCell(current.parent.row, current.parent.col)
-        ];
-      actualCell.setState({ type: CellType.actualPath });
-    }, this.animateResultSpeed());
+    return new Promise<boolean>((resolve) => {
+      let timer = setInterval(() => {
+        if (
+          pathHashmap[
+            generateClassNameForCell(current.parent.row, current.parent.col)
+          ].type === CellType.start
+        ) {
+          clearInterval(timer);
+          resolve(true);
+        }
+        let cellHashMap = this.cellHashmap();
+        let actualCell =
+          cellHashMap[generateClassNameForCell(current.row, current.col)];
+        current =
+          pathHashmap[
+            generateClassNameForCell(current.parent.row, current.parent.col)
+          ];
+        actualCell.setState({ type: CellType.actualPath });
+      }, this.animateResultSpeed());
+    });
   };
 
   _animatePathFromEnd = (path: PathFinderResult[]) => {
@@ -263,7 +275,7 @@ export class BidirectionalBFS extends PathFinder {
     }, this.animateResultSpeed());
   };
 
-  _animateResult = (result: PathFinderResult[], targetFound: boolean) => {
+  _animateResult = (result: PathFinderResult[]) => {
     // for each cell on our way color it with yellow color for testing
     for (let i = 1; i < result.length; i++) {
       let cell = result[i];
@@ -275,6 +287,25 @@ export class BidirectionalBFS extends PathFinder {
         actualCell.setState({ type: cell.type });
       }, i * this.animateResultSpeed());
     }
+  };
+
+  _animateResultWithPromise = (
+    result: PathFinderResult[]
+  ): Promise<boolean> => {
+    // for each cell on our way color it with yellow color for testing
+    return new Promise<boolean>((resolve, reject) => {
+      for (let i = 1; i < result.length; i++) {
+        let cell = result[i];
+        let cellHashMap = this.cellHashmap();
+        let actualCell =
+          cellHashMap[generateClassNameForCell(cell.row, cell.col)];
+        if (actualCell.state.type === CellType.start) continue;
+        setTimeout(() => {
+          actualCell.setState({ type: cell.type });
+          if (i === result.length - 1) resolve(true);
+        }, i * this.animateResultSpeed());
+      }
+    });
   };
 
   addToCellhashmap(map: BFSCellHashmap, cell: BFSCell) {

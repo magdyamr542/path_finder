@@ -25,7 +25,7 @@ export enum CellColor {
   dfsReturnPath = "grey",
   bfsPath = "yellow",
   actualPath = "pink",
-  bfsConnect = "grey",
+  bfsConnect = "pink",
 }
 
 export enum CellPickingMode {

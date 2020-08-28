@@ -13,13 +13,8 @@ export class DFS extends PathFinder {
     start.parent = { row: -1, col: -1 };
     start.type = CellType.start;
     let targetCellFound: boolean = this.dfsUtil(start, target, cells, result);
-    if (targetCellFound) {
-      this.animate(result, true);
-      return true;
-    } else {
-      this.animate(result, false);
-      return false;
-    }
+    this.animate(result, targetCellFound);
+    return targetCellFound;
   };
 
   dfsUtil = (

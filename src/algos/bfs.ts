@@ -13,13 +13,8 @@ export class BFS extends PathFinder {
     let result: BFSResult[] = [];
     let cellFound: boolean = this.bfsUtil(start, target, cells, result);
 
-    if (cellFound) {
-      this.animate(result, true);
-      return true;
-    } else {
-      this.animate(result, false);
-      return false;
-    }
+    this.animate(result, cellFound);
+    return cellFound;
   };
 
   bfsUtil = (
