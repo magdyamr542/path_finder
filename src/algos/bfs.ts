@@ -12,7 +12,6 @@ export class BFS extends PathFinder {
     let target = this.filterForCell(CellType.target);
     let result: BFSResult[] = [];
     let cellFound: boolean = this.bfsUtil(start, target, cells, result);
-
     this.animate(result, cellFound);
     return cellFound;
   };

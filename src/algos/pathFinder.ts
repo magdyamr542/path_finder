@@ -39,11 +39,11 @@ export class PathFinder {
   }
 
   animate = (result: PathFinderResult[], targetFound: boolean) => {
-    let resultToAnimate = result.filter(
+    let resultWithoutStartOrTarget = result.filter(
       (c) => c.type !== CellType.start && c.type !== CellType.target
     );
     animateResult(
-      resultToAnimate,
+      resultWithoutStartOrTarget,
       this.cellHashmap(),
       this.animateResultSpeed()
     ).then((res) => {
