@@ -2,7 +2,6 @@ import { CellHashMap } from "../interfaces/Maze.interface";
 import { Cell } from "../components/Cell";
 import { CellType } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
-import { animateResult } from "../animators/animator";
 
 interface PathFinderResultParent {
   row: number;
@@ -22,6 +21,7 @@ export class PathFinder {
   _cellHashMap: CellHashMap;
   rows: number;
   cols: number;
+  _stopAnimatingPath: boolean = false;
   _animateResultSpeed: number = 50;
   constructor(cellHashmap: CellHashMap, rows: number, cols: number) {
     this._cellHashMap = cellHashmap;
@@ -42,17 +42,17 @@ export class PathFinder {
     let resultWithoutStartOrTarget = result.filter(
       (c) => c.type !== CellType.start && c.type !== CellType.target
     );
-    animateResult(
+    this.animateResult(
       resultWithoutStartOrTarget,
       this.cellHashmap(),
-      this.animateResultSpeed() + 20
+      this.animateResultSpeed()
     ).then((res) => {
       let actualPath = this.constructActualPath(result);
       if (targetFound)
-        animateResult(
+        this.animateResult(
           actualPath,
           this.cellHashmap(),
-          this.animateResultSpeed() + 20
+          this.animateResultSpeed()
         );
     });
   };
@@ -135,23 +135,22 @@ export class PathFinder {
     }, this.animateResultSpeed());
   };
 
+  // animating a result array where the start and the target are not included
   animateResult = (
     result: PathFinderResult[],
-    targetFound: boolean
+    cellHashmap: CellHashMap,
+    animataResultSpeed: number
   ): Promise<number> => {
     return new Promise<number>((resolve, reject) => {
-      // for each cell on our way color it with yellow color for testing
-      let endingCellNumber = targetFound ? result.length - 1 : result.length; // if not found then animate till end , if found then dont consider the target
-      for (let i = 1; i < endingCellNumber; i++) {
+      for (let i = 0; i < result.length; i++) {
+        if (this._stopAnimatingPath) resolve(1);
         let cell = result[i];
-        let cellHashMap = this.cellHashmap();
         let actualCell =
-          cellHashMap[generateClassNameForCell(cell.row, cell.col)];
-        if (actualCell.state.type === CellType.start) continue;
+          cellHashmap[generateClassNameForCell(cell.row, cell.col)];
         setTimeout(() => {
           actualCell.setState({ type: cell.type });
-          if (i === endingCellNumber - 1) resolve(1);
-        }, i * this.animateResultSpeed());
+          if (i === result.length - 1) resolve(1);
+        }, i * animataResultSpeed);
       }
     });
   };

@@ -2,8 +2,6 @@ import { CellType } from "../enums/enums";
 import { PathFinder, PathFinderCell, PathFinderResult } from "./pathFinder";
 import { Queue } from "../datastructures/queue";
 import { generateClassNameForCell } from "../utils/utils";
-import { animateResult } from "../animators/animator";
-import { resolve } from "dns";
 
 export interface BFSResult extends PathFinderResult {}
 export interface BFSCell extends PathFinderCell {}
@@ -25,7 +23,7 @@ export class BidirectionalBFS extends PathFinder {
       resultTarget
     );
     console.log(resultStart, resultTarget);
-    this._animate(resultStart, resultTarget, cellFound, cells);
+    this._animate(resultStart, resultTarget, cells);
     return cellFound;
   };
 
@@ -122,23 +120,22 @@ export class BidirectionalBFS extends PathFinder {
   _animate = (
     resultStart: PathFinderResult[],
     resultTarget: PathFinderResult[],
-    targetFound: boolean,
     cells: PathFinderCell[][]
   ) => {
     // get the connecting point
-    let connectInStart = true;
     let connect = resultStart.filter((c) => c.type === CellType.bfsConnect);
     if (connect.length === 0) {
-      connectInStart = false;
       connect = resultTarget.filter((c) => c.type === CellType.bfsConnect);
     }
     let isStartFirstToAnimate = resultStart.length < resultTarget.length;
-    animateResult(
+
+    // animate the result
+    this.animateResult(
       isStartFirstToAnimate ? resultStart : resultTarget,
       this.cellHashmap(),
       this.animateResultSpeed()
     );
-    animateResult(
+    this.animateResult(
       isStartFirstToAnimate ? resultTarget : resultStart,
       this.cellHashmap(),
       this.animateResultSpeed()
@@ -153,12 +150,12 @@ export class BidirectionalBFS extends PathFinder {
         cells,
         resultTarget
       );
-      animateResult(
+      this.animateResult(
         pathFromConnectToStart,
         this.cellHashmap(),
         this.animateResultSpeed()
       );
-      animateResult(
+      this.animateResult(
         pathFromConnectToTarget,
         this.cellHashmap(),
         this.animateResultSpeed()
