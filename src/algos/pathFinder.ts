@@ -45,19 +45,22 @@ export class PathFinder {
     animateResult(
       resultWithoutStartOrTarget,
       this.cellHashmap(),
-      this.animateResultSpeed()
+      this.animateResultSpeed() + 20
     ).then((res) => {
       let actualPath = this.constructActualPath(result);
       if (targetFound)
         animateResult(
           actualPath,
           this.cellHashmap(),
-          this.animateResultSpeed()
+          this.animateResultSpeed() + 20
         );
     });
   };
 
-  constructActualPath = (path: PathFinderResult[]): PathFinderResult[] => {
+  constructActualPath = (
+    path: PathFinderResult[],
+    targetType?: CellType
+  ): PathFinderResult[] => {
     let actualPath: PathFinderResult[] = [];
     let pathHashmap: PathHashMap = path.reduce(
       (made: { [x: string]: PathFinderResult }, current: PathFinderResult) => {
@@ -70,15 +73,19 @@ export class PathFinder {
     );
     // get the target cell
     let cells = Object.values(pathHashmap);
+    let targetOfFilter = targetType ? targetType : CellType.target;
     let target = cells.filter(
-      (cell: PathFinderResult, index: number) => cell.type === CellType.target
+      (cell: PathFinderResult, index: number) => cell.type === targetOfFilter
     )[0];
     // from the target cell construct the path till you reach the start cell
     let current =
       pathHashmap[
         generateClassNameForCell(target.parent.row, target.parent.col)
       ];
-    while (current.type !== CellType.start) {
+    while (
+      current.type !== CellType.start &&
+      current.type !== CellType.target
+    ) {
       current.type = CellType.actualPath;
       actualPath.push(current);
       current =

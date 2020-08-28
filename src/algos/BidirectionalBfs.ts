@@ -2,6 +2,8 @@ import { CellType } from "../enums/enums";
 import { PathFinder, PathFinderCell, PathFinderResult } from "./pathFinder";
 import { Queue } from "../datastructures/queue";
 import { generateClassNameForCell } from "../utils/utils";
+import { animateResult } from "../animators/animator";
+import { resolve } from "dns";
 
 export interface BFSResult extends PathFinderResult {}
 export interface BFSCell extends PathFinderCell {}
@@ -15,7 +17,6 @@ export class BidirectionalBFS extends PathFinder {
     let target = this.filterForCell(CellType.target);
     let resultStart: BFSResult[] = [];
     let resultTarget: BFSResult[] = [];
-
     let cellFound: boolean = this.bfsUtil(
       start,
       target,
@@ -23,6 +24,7 @@ export class BidirectionalBFS extends PathFinder {
       resultStart,
       resultTarget
     );
+    console.log(resultStart, resultTarget);
     this._animate(resultStart, resultTarget, cellFound, cells);
     return cellFound;
   };
@@ -107,9 +109,6 @@ export class BidirectionalBFS extends PathFinder {
             adjCell.type !== CellType.bfsPath &&
             adjCell.type !== CellType.visited
           ) {
-            this.cellHashmap()[
-              generateClassNameForCell(adjCell.row, adjCell.col)
-            ].setState({ type: CellType.bfsPath });
             adjCell.parent = { row: currentCell.row, col: currentCell.col };
             currentQueue.enqueue(adjCell);
             this.addToCellhashmap(visitedFromThisSide, adjCell);
@@ -133,26 +132,45 @@ export class BidirectionalBFS extends PathFinder {
       connectInStart = false;
       connect = resultTarget.filter((c) => c.type === CellType.bfsConnect);
     }
-
-    // call the animator for both parts
-    this._animateResultWithPromise(resultStart).then((res) => {
-      this._animateResultWithPromise(resultTarget).then((res) => {
-        this._animatePathFromConnectToStart(
-          connect,
-          cells,
-          resultStart
-        ).then((res) =>
-          this._animatePathFromConnectToEnd(connect, cells, resultTarget)
-        );
-      });
+    let isStartFirstToAnimate = resultStart.length < resultTarget.length;
+    animateResult(
+      isStartFirstToAnimate ? resultStart : resultTarget,
+      this.cellHashmap(),
+      this.animateResultSpeed()
+    );
+    animateResult(
+      isStartFirstToAnimate ? resultTarget : resultStart,
+      this.cellHashmap(),
+      this.animateResultSpeed()
+    ).then((res) => {
+      let pathFromConnectToStart = this._getPathFromConnectToStart(
+        connect,
+        cells,
+        resultStart
+      );
+      let pathFromConnectToTarget = this._getPathFromConnectToTarget(
+        connect,
+        cells,
+        resultTarget
+      );
+      animateResult(
+        pathFromConnectToStart,
+        this.cellHashmap(),
+        this.animateResultSpeed()
+      );
+      animateResult(
+        pathFromConnectToTarget,
+        this.cellHashmap(),
+        this.animateResultSpeed()
+      );
     });
   };
 
-  _animatePathFromConnectToStart(
+  _getPathFromConnectToStart(
     connect: PathFinderResult[],
     cells: PathFinderCell[][],
     resultStart: PathFinderResult[]
-  ): Promise<boolean> {
+  ) {
     // get all ajacent cells of the connect cell which are in the targetStart array
     let connectAdjCells = this.getAdjacentCells(connect[0], cells);
     let cellInStartWhichIsAdjToConnectCell: PathFinderCell;
@@ -168,10 +186,10 @@ export class BidirectionalBFS extends PathFinder {
       col: cellInStartWhichIsAdjToConnectCell.col,
     };
     resultStart.push(startConnect);
-    return this._animatePathFromStart(resultStart);
+    return this.constructActualPath(resultStart, CellType.bfsConnect);
   }
 
-  _animatePathFromConnectToEnd(
+  _getPathFromConnectToTarget(
     connect: PathFinderResult[],
     cells: PathFinderCell[][],
     resultTarget: PathFinderResult[]
@@ -191,122 +209,8 @@ export class BidirectionalBFS extends PathFinder {
       col: cellInEndWhichIsAdjToConnectCell.col,
     };
     resultTarget.push(startConnect);
-    this._animatePathFromEnd(resultTarget);
+    return this.constructActualPath(resultTarget, CellType.bfsConnect);
   }
-
-  _animatePathFromStart = (path: PathFinderResult[]): Promise<boolean> => {
-    let pathHashmap: { [x: string]: PathFinderResult } = path.reduce(
-      (made: { [x: string]: PathFinderResult }, current: PathFinderResult) => {
-        return {
-          ...made,
-          [generateClassNameForCell(current.row, current.col)]: current,
-        };
-      },
-      {}
-    );
-    let cells = Object.values(pathHashmap);
-    let target = cells.filter(
-      (cell: PathFinderResult, index: number) =>
-        cell.type === CellType.bfsConnect
-    )[0];
-
-    let current =
-      pathHashmap[
-        generateClassNameForCell(target.parent.row, target.parent.col)
-      ];
-
-    return new Promise<boolean>((resolve) => {
-      let timer = setInterval(() => {
-        if (
-          pathHashmap[
-            generateClassNameForCell(current.parent.row, current.parent.col)
-          ].type === CellType.start
-        ) {
-          clearInterval(timer);
-          resolve(true);
-        }
-        let cellHashMap = this.cellHashmap();
-        let actualCell =
-          cellHashMap[generateClassNameForCell(current.row, current.col)];
-        current =
-          pathHashmap[
-            generateClassNameForCell(current.parent.row, current.parent.col)
-          ];
-        actualCell.setState({ type: CellType.actualPath });
-      }, this.animateResultSpeed());
-    });
-  };
-
-  _animatePathFromEnd = (path: PathFinderResult[]) => {
-    let pathHashmap: { [x: string]: PathFinderResult } = path.reduce(
-      (made: { [x: string]: PathFinderResult }, current: PathFinderResult) => {
-        return {
-          ...made,
-          [generateClassNameForCell(current.row, current.col)]: current,
-        };
-      },
-      {}
-    );
-    let cells = Object.values(pathHashmap);
-    let start = cells.filter(
-      (cell: PathFinderResult, index: number) =>
-        cell.type === CellType.bfsConnect
-    )[0];
-
-    let cellHashMap = this.cellHashmap();
-    start =
-      pathHashmap[generateClassNameForCell(start.parent.row, start.parent.col)];
-
-    let timer = setInterval(() => {
-      if (
-        pathHashmap[
-          generateClassNameForCell(start.parent.row, start.parent.col)
-        ].type === CellType.target
-      ) {
-        clearInterval(timer);
-      }
-      let actualCell =
-        cellHashMap[generateClassNameForCell(start.row, start.col)];
-      start =
-        pathHashmap[
-          generateClassNameForCell(start.parent.row, start.parent.col)
-        ];
-      actualCell.setState({ type: CellType.actualPath });
-    }, this.animateResultSpeed());
-  };
-
-  _animateResult = (result: PathFinderResult[]) => {
-    // for each cell on our way color it with yellow color for testing
-    for (let i = 1; i < result.length; i++) {
-      let cell = result[i];
-      let cellHashMap = this.cellHashmap();
-      let actualCell =
-        cellHashMap[generateClassNameForCell(cell.row, cell.col)];
-      if (actualCell.state.type === CellType.start) continue;
-      setTimeout(() => {
-        actualCell.setState({ type: cell.type });
-      }, i * this.animateResultSpeed());
-    }
-  };
-
-  _animateResultWithPromise = (
-    result: PathFinderResult[]
-  ): Promise<boolean> => {
-    // for each cell on our way color it with yellow color for testing
-    return new Promise<boolean>((resolve, reject) => {
-      for (let i = 1; i < result.length; i++) {
-        let cell = result[i];
-        let cellHashMap = this.cellHashmap();
-        let actualCell =
-          cellHashMap[generateClassNameForCell(cell.row, cell.col)];
-        if (actualCell.state.type === CellType.start) continue;
-        setTimeout(() => {
-          actualCell.setState({ type: cell.type });
-          if (i === result.length - 1) resolve(true);
-        }, i * this.animateResultSpeed());
-      }
-    });
-  };
 
   addToCellhashmap(map: BFSCellHashmap, cell: BFSCell) {
     let key = generateClassNameForCell(cell.row, cell.col);
