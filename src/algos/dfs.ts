@@ -55,10 +55,14 @@ export class DFS extends PathFinder {
         if (found) return true;
       }
     }
+
     result.push({
       row: current.row,
       col: current.col,
-      type: CellType.dfsReturnPath,
+      type:
+        current.type !== CellType.start
+          ? CellType.dfsReturnPath
+          : CellType.start,
       parent: current.parent,
     });
     return false;

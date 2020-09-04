@@ -47,13 +47,14 @@ export class PathFinder {
       this.cellHashmap(),
       this.animateResultSpeed()
     ).then((res) => {
-      let actualPath = this.constructActualPath(result);
-      if (targetFound)
+      if (targetFound) {
+        let actualPath = this.constructActualPath(result);
         this.animateResult(
           actualPath,
           this.cellHashmap(),
           this.animateResultSpeed()
         );
+      }
     });
   };
 
@@ -142,6 +143,7 @@ export class PathFinder {
     animataResultSpeed: number
   ): Promise<number> => {
     return new Promise<number>((resolve, reject) => {
+      console.log(result);
       for (let i = 0; i < result.length; i++) {
         if (this._stopAnimatingPath) resolve(1);
         let cell = result[i];
