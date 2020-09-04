@@ -22,7 +22,7 @@ export class PathFinder {
   rows: number;
   cols: number;
   _stopAnimatingPath: boolean = false;
-  _animateResultSpeed: number = 50;
+  _animateResultSpeed: number = 25;
   constructor(cellHashmap: CellHashMap, rows: number, cols: number) {
     this._cellHashMap = cellHashmap;
     this.rows = rows - 1; // the mapping is from 0 to rows - 1
@@ -243,10 +243,9 @@ export class PathFinder {
     col: number,
     cells: PathFinderCell[][]
   ): PathFinderCell | null => {
-    if (this.isValidCell(row, col)) {
+    if (row >= 0 && row <= this.rows && col >= 0 && col <= this.cols) {
       return cells[row][col];
-    }
-    return null;
+    } else return null;
   };
 
   // getters and setters for the animating speed

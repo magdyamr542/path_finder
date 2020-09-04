@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Cell, MouseEvents, CellHashMap } from "../interfaces/Maze.interface";
 import { Cell as CellComponent } from "./Cell";
-import { MouseStatus, CellPickingMode } from "../enums/enums";
+import { MouseStatus, CellPickingMode, CellType } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
 import { DFS } from "../algos/dfs";
 import { BFS } from "../algos/bfs";
@@ -110,6 +110,13 @@ export class Maze extends Component<Props, State> {
   resetMaze = (): void => {
     Object.values(this.cellHashMap).forEach((cell: CellComponent) => {
       cell.unVisitCell();
+    });
+  };
+
+  // reseting everything but the bolcks
+  resetMazeAndKeepBlocks = (): void => {
+    Object.values(this.cellHashMap).forEach((cell: CellComponent) => {
+      if (cell.state.type !== CellType.visited) cell.unVisitCell();
     });
   };
 
@@ -229,6 +236,12 @@ export class Maze extends Component<Props, State> {
               className="button bd-bfs"
             >
               Bidirectional BFS
+            </button>
+            <button
+              onClick={this.resetMazeAndKeepBlocks}
+              className="button bd-bfs"
+            >
+              Reset Paths
             </button>
           </div>
 
