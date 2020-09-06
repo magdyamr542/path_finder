@@ -102,7 +102,7 @@ export class Cell extends Component<CellProps, CellState> {
       width: this.props.width,
       height: this.props.height,
       cursor: "pointer",
-      marginRight: "1px",
+      marginRight: "0px",
       backgroundColor: CellColor[this.state.type],
     };
 
