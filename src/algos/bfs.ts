@@ -28,10 +28,15 @@ export class BFS extends PathFinder {
     queue.enqueue(start);
     while (!queue.isEmpty()) {
       let current: BFSResult = queue.dequeue();
-      if (current.type !== CellType.bfsPath) {
-        if (current.type !== CellType.start) current.type = CellType.bfsPath; // set the bfs path cells if not the start cell
-        result.push(current);
-      }
+      if (
+        current.type === CellType.bfsPath ||
+        current.type === CellType.visited
+      )
+        continue;
+
+      if (current.type !== CellType.start) current.type = CellType.bfsPath; // set the bfs path cells if not the start cell
+      result.push(current);
+
       if (this.isEqual(current, target)) {
         current.type = CellType.target; // if target then change its type
         return true;
