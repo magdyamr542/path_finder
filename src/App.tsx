@@ -5,7 +5,7 @@ import { MazeLegend } from "./components/MazeLegend";
 import { LegendItem } from "./interfaces/Maze.interface";
 
 function App() {
-  let cols = 30;
+  let cols = 40;
   let rows = 20;
   let cellDimension = 40;
 
@@ -45,6 +45,10 @@ function App() {
 
   return (
     <div className="App">
+      <div className="app-title-container">
+        <h1 className="app-title">Maze Visualiser</h1>
+        <span className="app-title-line"></span>
+      </div>
       <MazeLegend items={legendItems}></MazeLegend>
       <div className="mazeOuterContainer">
         <Maze

@@ -1,11 +1,29 @@
 .App {
   text-align: center;
-  margin-top: 5%;
-  margin-bottom: 5%;
+  margin: 50px 0;
   font-family: sans-serif;
 }
 
 .mazeContainer {
   font-size: 0;
   margin: 30px;
+}
+
+.app-title-container {
+  margin-bottom: 50px;
+}
+
+.app-title {
+  letter-spacing: 5px;
+  font-family: sans-serif;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 5px;
+}
+
+.app-title-line {
+  width: 500px;
+  border: 2px solid black;
+  display: block;
+  margin: auto;
 }

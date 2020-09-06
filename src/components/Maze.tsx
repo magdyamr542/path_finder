@@ -116,7 +116,13 @@ export class Maze extends Component<Props, State> {
   // reseting everything but the bolcks
   resetMazeAndKeepBlocks = (): void => {
     Object.values(this.cellHashMap).forEach((cell: CellComponent) => {
-      if (cell.state.type !== CellType.visited) cell.unVisitCell();
+      let type = cell.state.type;
+      if (
+        type !== CellType.visited &&
+        type !== CellType.target &&
+        type !== CellType.start
+      )
+        cell.unVisitCell();
     });
   };
 
