@@ -88,11 +88,17 @@ export class BidirectionalBFS extends PathFinder {
   ) {
     if (!currentQueue.isEmpty()) {
       let currentCell = currentQueue.dequeue();
-      if (currentCell.type === CellType.visited) return false;
+      if (
+        currentCell.type === CellType.visited ||
+        currentCell.type === CellType.bfsPath
+      )
+        return false;
       if (currentCell.type === CellType.unvisited) {
         currentCell.type = CellType.bfsPath;
         result.push(currentCell);
       }
+
+      console.log("here ");
 
       for (let adjCell of this.getAdjacentCells(currentCell, cells)) {
         // if we visited that cell from other side then there is a path
