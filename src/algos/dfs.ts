@@ -23,8 +23,6 @@ export class DFS extends PathFinder {
     cells: DFSCell[][],
     result: DFSResult[]
   ): boolean => {
-    console.log("inside dfs util");
-
     if (
       !this.isValidCell(current.row, current.col) ||
       !this.isNotVisited(current.row, current.col, cells)

@@ -98,8 +98,6 @@ export class BidirectionalBFS extends PathFinder {
         result.push(currentCell);
       }
 
-      console.log("here ");
-
       for (let adjCell of this.getAdjacentCells(currentCell, cells)) {
         // if we visited that cell from other side then there is a path
         if (this.cellhashmapContains(visitedFromThatSide, adjCell)) {

@@ -143,7 +143,6 @@ export class PathFinder {
     animataResultSpeed: number
   ): Promise<number> => {
     return new Promise<number>((resolve, reject) => {
-      console.log(result);
       for (let i = 0; i < result.length; i++) {
         if (this._stopAnimatingPath) resolve(1);
         let cell = result[i];

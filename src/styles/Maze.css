@@ -92,12 +92,19 @@ button.bd-bfs:hover {
 
 .button-container-pick {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     margin: 0 20%;
 }
 
 .button-container-search {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+    margin: 0 20%;
+}
+
+
+.button-container-reset {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     margin: 0 20%;
 }

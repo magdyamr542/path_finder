@@ -212,15 +212,25 @@ export class Maze extends Component<Props, State> {
             >
               Pick a Start Cell
             </button>
-            <button onClick={this.resetMaze} className="button reset">
-              Reset Maze
-            </button>
 
             <button
               className="button target"
               onClick={() => this.pickCellWithSomeType(CellPickingMode.target)}
             >
               Pick a target Cell
+            </button>
+          </div>
+
+          <div className="button-container-reset">
+            <button
+              onClick={this.resetMazeAndKeepBlocks}
+              className="button bd-bfs"
+            >
+              Reset Paths
+            </button>
+
+            <button onClick={this.resetMaze} className="button reset">
+              Reset Maze
             </button>
           </div>
 
@@ -237,14 +247,7 @@ export class Maze extends Component<Props, State> {
             >
               Bidirectional BFS
             </button>
-            <button
-              onClick={this.resetMazeAndKeepBlocks}
-              className="button bd-bfs"
-            >
-              Reset Paths
-            </button>
           </div>
-
           <div className="mazeContainer">
             {rows.map((row: Cell[], i: number) => {
               return (
