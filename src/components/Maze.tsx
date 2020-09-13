@@ -5,6 +5,7 @@ import { MouseStatus, CellPickingMode, CellType } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
 import { DFS } from "../algos/dfs";
 import { BFS } from "../algos/bfs";
+import { PriorityQueue } from "../datastructures/priorityQueue";
 import { BidirectionalBFS } from "../algos/BidirectionalBfs";
 import "../styles/Maze.css";
 
@@ -20,6 +21,25 @@ interface State {
 }
 
 export class Maze extends Component<Props, State> {
+  createHeapForTesting() {
+    let comp = (a: number, b: number) => {
+      console.log(a, b, "comp args");
+      if (a == b) return 0;
+      if (a > b) return 1;
+      return -1;
+    };
+
+    let heap = new PriorityQueue<number>(10, comp);
+    heap.add(4);
+    heap.add(10);
+    heap.add(12);
+    heap.add(3);
+    heap.add(-1);
+    heap.add(9);
+    heap.add(20);
+    heap.add(-5);
+    console.log(heap);
+  }
   dfs: DFS;
   bfs: BFS;
   bidirectionalBfs: BidirectionalBFS;
@@ -46,6 +66,7 @@ export class Maze extends Component<Props, State> {
       props.rowsNumber,
       props.columnsNumber
     );
+    this.createHeapForTesting();
   }
 
   // generating the cells

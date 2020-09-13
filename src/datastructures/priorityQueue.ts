@@ -30,27 +30,26 @@ export class PriorityQueue<T> {
     let leftIndex = this.left(index);
     let rightIndex = this.right(index);
     let indexToSwap = index;
+    let leftElem = this._getElement(leftIndex);
+    let rightElem = this._getElement(rightIndex);
+    let currentElem = this._getElement(index);
 
     if (
       leftIndex < this.length &&
-      this._comparingFunc(
-        this._getElement[leftIndex],
-        this._getElement[indexToSwap]
-      ) > 0
+      this._comparingFunc(leftElem, currentElem) > 0
     ) {
       // it means that left has more priority
       indexToSwap = leftIndex;
+      currentElem = leftElem;
     }
 
     if (
       rightIndex < this.length &&
-      this._comparingFunc(
-        this._getElement[rightIndex],
-        this._getElement[indexToSwap]
-      ) > 0
+      this._comparingFunc(rightElem, currentElem) > 0
     ) {
       // it means that right has more priority
       indexToSwap = rightIndex;
+      currentElem = rightElem;
     }
 
     // if we need to swap then swap and call the method for the swapped index
@@ -63,7 +62,8 @@ export class PriorityQueue<T> {
   // get the element with height priority
   extractElementWithHeightPriority(): T {
     let result = this._getElement(0);
-    let last = this._getElement(this.length);
+    let last = this._getElement(this.length - 1);
+    this._elements[this.length - 1] = null;
     this.length--;
     this._elements[0] = last;
     this._heapify(0);
@@ -81,24 +81,27 @@ export class PriorityQueue<T> {
       throw Error("the heap is full!!");
     }
     this._elements[this.length] = element;
-    this._heapifyUp(element);
+    this._heapifyUp(this.length);
+    this.length++;
   }
 
   // sift the element up till it reaches its place
-  private _heapifyUp(element: T) {
-    let current = this.length;
+  private _heapifyUp(index: number) {
+    let elemToHeapifyUp = this._getElement(index);
+    let current = index;
+    let currentElem = elemToHeapifyUp;
+    let currentParent = this._getElement(this.parent(current));
     while (
       this.parent(current) >= 0 &&
-      this._comparingFunc(
-        this._getElement(current),
-        this._getElement(this.parent(current))
-      ) > 0
+      this._comparingFunc(currentElem, currentParent) > 0
     ) {
       // it means that the parent has more priority
       this._swap(current, this.parent(current));
       current = this.parent(current);
+      currentElem = this._getElement(current);
+      currentParent = this._getElement(this.parent(current));
     }
-    this._elements[current] = element;
+    this._elements[current] = elemToHeapifyUp;
   }
 
   // change the priority of an element
@@ -114,15 +117,17 @@ export class PriorityQueue<T> {
       );
     }
     this._elements[indexOfElement] = newPriority;
-    let currentNewElement: T = this._getElement[indexOfElement];
     // determine if we should go up or down
-    let parent = this.parent(indexOfElement);
+    let parentIndex = this.parent(indexOfElement);
+    let parentElem = this._getElement(parentIndex);
+    let currentNewElement = this._getElement(indexOfElement);
+
     if (
-      parent >= 0 &&
-      this._comparingFunc(currentNewElement, this._getElement(parent)) > 0
+      parentIndex >= 0 &&
+      this._comparingFunc(currentNewElement, parentElem) > 0
     ) {
       // the current new elem has a bigger prio so it should go up
-      this._heapifyUp(currentNewElement);
+      this._heapifyUp(indexOfElement);
     } else {
       this._heapify(indexOfElement);
     }
@@ -136,10 +141,7 @@ export class PriorityQueue<T> {
   }
 
   // getting an element with its index
-  private _getElement(index: number) {
-    if (index >= this._size) {
-      throw Error("index out of bounds!!");
-    }
+  _getElement(index: number) {
     return this._elements[index];
   }
 }
