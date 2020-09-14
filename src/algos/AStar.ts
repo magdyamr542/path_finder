@@ -145,13 +145,22 @@ export class AStar extends PathFinder {
   getAdjacentAStarCells(cell: AStarCell, hashmap: AStarHashmap): AStarCell[] {
     let { row, col } = cell;
     let result = [];
-    for (let i = -1; i <= 1; i++) {
-      for (let j = -1; j <= 1; j++) {
-        if (i == 0 && j == 0) continue;
-        let cell = this.getAStarCell(row + i, col + j, hashmap);
-        if (cell) result.push(cell);
-      }
-    }
+    // use this code to get 8 adj cells. it means you can go in any direction even the diagonals
+    // for (let i = -1; i <= 1; i++) {
+    //   for (let j = -1; j <= 1; j++) {
+    //     if (i == 0 && j == 0) continue;
+    //     let cell = this.getAStarCell(row + i, col + j, hashmap);
+    //     if (cell) result.push(cell);
+    //   }
+    // }
+    let rightCell = this.getAStarCell(row, col + 1, hashmap);
+    let leftCell = this.getAStarCell(row, col - 1, hashmap);
+    let upperCell = this.getAStarCell(row + 1, col, hashmap);
+    let bottomCell = this.getAStarCell(row - 1, col, hashmap);
+    if (rightCell) result.push(rightCell);
+    if (leftCell) result.push(leftCell);
+    if (upperCell) result.push(upperCell);
+    if (bottomCell) result.push(bottomCell);
     return result;
   }
 
