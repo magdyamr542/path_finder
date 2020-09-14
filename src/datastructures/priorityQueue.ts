@@ -60,7 +60,7 @@ export class PriorityQueue<T> {
     }
 
     // if we need to swap then swap and call the method for the swapped index
-    if (index != indexToSwap) {
+    if (index !== indexToSwap) {
       this._swap(index, indexToSwap);
       this._heapify(indexToSwap);
     }
