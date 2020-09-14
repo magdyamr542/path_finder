@@ -34,24 +34,18 @@ export class AStar extends PathFinder {
       aStarHashmap,
       result
     );
-    let shortestPath = this.constructShortestPath(startCell, targetCell);
-    this.visualisePath(result, shortestPath, found);
+    this.visualisePath(result, found);
     return found;
   }
 
-  visualisePath(
-    result: AStarCell[],
-    shortestPath: AStarCell[],
-    found: boolean
-  ) {
+  visualisePath(result: AStarCell[], found: boolean) {
     result[0].type = CellType.start;
-    shortestPath[0].type = CellType.target;
+    if (found) result[result.length - 1].type = CellType.target;
     this.animate(
       result.map((e) => {
         return { row: e.row, col: e.col, type: e.type, parent: e.parent };
       }),
-      found,
-      shortestPath
+      found
     );
     // this.constructShortestPath(aStarHashmap, startCell, targetCell);
   }

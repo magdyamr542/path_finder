@@ -5,8 +5,8 @@ import { MazeLegend } from "./components/MazeLegend";
 import { LegendItem } from "./interfaces/Maze.interface";
 
 function App() {
-  let cols = 40;
-  let rows = 30;
+  let cols = 60;
+  let rows = 25;
   let cellDimension = 30;
 
   let legendItems: LegendItem[];

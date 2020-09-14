@@ -29,7 +29,7 @@ export enum CellColor {
   bfsPath = "yellow",
   actualPath = "pink",
   bfsConnect = "pink",
-  aStarVisited = "purple",
+  aStarVisited = "yellow",
   aStarVisiting = "grey",
   aStarShortestPath = "orange",
 }
