@@ -134,6 +134,7 @@ export class AStar extends PathFinder {
           adjCell.fCost = this._calculateFCost(adjCell.hCost, adjCell.fCost);
           adjCell.parent = minCell;
           adjCell.type = CellType.aStarVisiting;
+          result.push(adjCell);
           if (
             !openCells.has(generateClassNameForCell(adjCell.row, adjCell.col))
           ) {
@@ -150,14 +151,13 @@ export class AStar extends PathFinder {
   getAdjacentAStarCells(cell: AStarCell, hashmap: AStarHashmap): AStarCell[] {
     let { row, col } = cell;
     let result = [];
-    let rightCell = this.getAStarCell(row, col + 1, hashmap);
-    let leftCell = this.getAStarCell(row, col - 1, hashmap);
-    let upperCell = this.getAStarCell(row + 1, col, hashmap);
-    let bottomCell = this.getAStarCell(row - 1, col, hashmap);
-    if (rightCell) result.push(rightCell);
-    if (leftCell) result.push(leftCell);
-    if (upperCell) result.push(upperCell);
-    if (bottomCell) result.push(bottomCell);
+    for (let i = -1; i <= 1; i++) {
+      for (let j = -1; j <= 1; j++) {
+        if (i == 0 && j == 0) continue;
+        let cell = this.getAStarCell(row + i, col + j, hashmap);
+        if (cell) result.push(cell);
+      }
+    }
     return result;
   }
 
@@ -197,15 +197,9 @@ export class AStar extends PathFinder {
     firstCell: AStarCell,
     secondCell: AStarCell
   ): number {
-    let distanceX = Math.abs(firstCell.row - secondCell.row);
-    let distanceY = Math.abs(firstCell.col - secondCell.col);
-    return (
-      7 * Math.min(distanceX, distanceY) +
-      10 *
-        Math.abs(
-          Math.max(distanceY, distanceX) - Math.min(distanceY, distanceX)
-        )
-    );
+    let distanceX = firstCell.row - secondCell.row;
+    let distanceY = firstCell.col - secondCell.col;
+    return Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
   }
   // creating the hashmap that we will work with
   _createAStarHashmap(): AStarHashmap {
