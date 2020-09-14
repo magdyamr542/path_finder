@@ -67,7 +67,7 @@ export class PriorityQueue<T> {
   }
 
   // get the element with height priority
-  extractElementWithHeightPriority(): T {
+  extractElementWithHighestPriority(): T {
     let result = this._getElement(0);
     let last = this._getElement(this.length - 1);
     this._elements[this.length - 1] = null;

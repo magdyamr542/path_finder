@@ -3,42 +3,50 @@ import { PathFinder } from "./pathFinder";
 import { PriorityQueue } from "../datastructures/priorityQueue";
 import { generateClassNameForCell } from "../utils/utils";
 
-interface AStarCell {
-  gCost: number;
+interface BestFirstCell {
   hCost: number;
-  fCost: number;
   type: CellType;
-  parent: AStarCell;
+  parent: BestFirstCell;
   row: number;
   col: number;
 }
 
-interface AStarHashmap {
-  [identifier: string]: AStarCell;
+interface BestFirstHashmap {
+  [identifier: string]: BestFirstCell;
 }
 
-export class AStar extends PathFinder {
+export class BestFirst extends PathFinder {
   findShortestPath(): boolean {
     // create the astart cells
-    let aStarHashmap: AStarHashmap = this._createAStarHashmap();
-    let startCell = Object.values(aStarHashmap).filter(
+    let bestFirstHashmap: BestFirstHashmap = this._createBestFirstHashmap();
+    let startCell = Object.values(bestFirstHashmap).filter(
       (c) => c.type === CellType.start
     )[0];
-    let targetCell = Object.values(aStarHashmap).filter(
+    let targetCell = Object.values(bestFirstHashmap).filter(
       (c) => c.type === CellType.target
     )[0];
-    let result: AStarCell[] = [];
-    let found = this.findShortestPathUtil(
+    // calculate the hCosts for all cells
+    this._calculateHCostForAllCells(bestFirstHashmap, targetCell);
+    let result: BestFirstCell[] = [];
+    let found = this.bestFirstSearch(
       startCell,
       targetCell,
-      aStarHashmap,
+      bestFirstHashmap,
       result
     );
     this.visualisePath(result, found);
     return found;
   }
+  private _calculateHCostForAllCells(
+    bestFirstHashmap: BestFirstHashmap,
+    targetCell: BestFirstCell
+  ) {
+    Object.values(bestFirstHashmap).forEach((v) => {
+      v.hCost = this._getEstimatedDistanceBetweenTwoCells(v, targetCell);
+    });
+  }
 
-  visualisePath(result: AStarCell[], found: boolean) {
+  visualisePath(result: BestFirstCell[], found: boolean) {
     result[0].type = CellType.start;
     if (found) result[result.length - 1].type = CellType.target;
     this.animate(
@@ -51,23 +59,16 @@ export class AStar extends PathFinder {
   }
 
   // finding the shortest path between two nodes using the A* Algorithm
-  findShortestPathUtil(
-    startCell: AStarCell,
-    targetCell: AStarCell,
-    hashmap: AStarHashmap,
-    result: AStarCell[]
+  bestFirstSearch(
+    startCell: BestFirstCell,
+    targetCell: BestFirstCell,
+    hashmap: BestFirstHashmap,
+    result: BestFirstCell[]
   ) {
     let minHeap = this._initMinheap(Object.values(hashmap).length);
     let openCells = new Set<string>();
     let closedCells = new Set<string>();
 
-    // init the start Cell
-    startCell.hCost = this._getEstimatedDistanceBetweenTwoCells(
-      startCell,
-      targetCell
-    );
-    startCell.gCost = 0;
-    startCell.fCost = this._calculateFCost(startCell.hCost, startCell.gCost);
     openCells.add(generateClassNameForCell(startCell.row, startCell.col));
 
     // add the start cell to the minheap
@@ -80,7 +81,6 @@ export class AStar extends PathFinder {
       // remove the minCell from the open cells and add it to the closed ones
       openCells.delete(generateClassNameForCell(minCell.row, minCell.col));
       closedCells.add(generateClassNameForCell(minCell.row, minCell.col));
-
       // if this cell is the path then return true
       if (
         this.isEqual(
@@ -94,28 +94,16 @@ export class AStar extends PathFinder {
       }
 
       // if not then process all its adj cells
-      for (let adjCell of this.getAdjacentAStarCells(minCell, hashmap)) {
+      for (let adjCell of this.getAdjacentBestFirstCells(minCell, hashmap)) {
         if (
           closedCells.has(generateClassNameForCell(adjCell.row, adjCell.col)) ||
           adjCell.type === CellType.visited
         ) {
           continue; // then we cannot process this node
         }
-        // if the neighbour is not on the ope set or there is a shorter path to it then add it
-        let newGCostToAdjCell =
-          minCell.gCost +
-          this._getEstimatedDistanceBetweenTwoCells(minCell, adjCell);
         if (
-          !openCells.has(generateClassNameForCell(adjCell.row, adjCell.col)) ||
-          newGCostToAdjCell < adjCell.gCost
+          !openCells.has(generateClassNameForCell(adjCell.row, adjCell.col))
         ) {
-          let oldCopyOfAdjCell = Object.assign({}, adjCell);
-          adjCell.gCost = newGCostToAdjCell;
-          adjCell.hCost = this._getEstimatedDistanceBetweenTwoCells(
-            adjCell,
-            targetCell
-          );
-          adjCell.fCost = this._calculateFCost(adjCell.hCost, adjCell.fCost);
           adjCell.parent = minCell;
           adjCell.type = CellType.aStarVisiting;
           result.push(adjCell);
@@ -124,37 +112,31 @@ export class AStar extends PathFinder {
           ) {
             openCells.add(generateClassNameForCell(adjCell.row, adjCell.col));
             minHeap.add(adjCell);
-          } else {
-            minHeap.changePriority(oldCopyOfAdjCell, adjCell);
           }
         }
       }
     }
     return false;
   }
-  getAdjacentAStarCells(cell: AStarCell, hashmap: AStarHashmap): AStarCell[] {
+  getAdjacentBestFirstCells(
+    cell: BestFirstCell,
+    hashmap: BestFirstHashmap
+  ): BestFirstCell[] {
     let { row, col } = cell;
     let result = [];
     // use this code to get 8 adj cells. it means you can go in any direction even the diagonals
-    // for (let i = -1; i <= 1; i++) {
-    //   for (let j = -1; j <= 1; j++) {
-    //     if (i == 0 && j == 0) continue;
-    //     let cell = this.getAStarCell(row + i, col + j, hashmap);
-    //     if (cell) result.push(cell);
-    //   }
-    // }
-    let rightCell = this.getAStarCell(row, col + 1, hashmap);
-    let leftCell = this.getAStarCell(row, col - 1, hashmap);
-    let upperCell = this.getAStarCell(row + 1, col, hashmap);
-    let bottomCell = this.getAStarCell(row - 1, col, hashmap);
-    if (rightCell) result.push(rightCell);
-    if (leftCell) result.push(leftCell);
-    if (upperCell) result.push(upperCell);
-    if (bottomCell) result.push(bottomCell);
+    for (let i = -1; i <= 1; i++) {
+      for (let j = -1; j <= 1; j++) {
+        if (i == 0 && j == 0) continue;
+        let cell = this.getBestFirstCell(row + i, col + j, hashmap);
+        if (cell) result.push(cell);
+      }
+    }
+
     return result;
   }
 
-  getAStarCell(row: number, col: number, hashmap: AStarHashmap) {
+  getBestFirstCell(row: number, col: number, hashmap: BestFirstHashmap) {
     if (row >= 0 && row <= this.rows && col >= 0 && col <= this.cols) {
       return hashmap[generateClassNameForCell(row, col)];
     } else return null;
@@ -164,20 +146,16 @@ export class AStar extends PathFinder {
   _calculateFCost(hCost: number, gCost: number): number {
     return hCost + gCost;
   }
-  _initMinheap(size: number): PriorityQueue<AStarCell> {
-    let comparingFunction = (a: AStarCell, b: AStarCell) => {
-      if (a.fCost < b.fCost) return 1;
-      else if (a.fCost > b.fCost) return -1;
-      else {
-        if (a.hCost < b.hCost) return 1;
-        else if (a.hCost > b.hCost) return -1;
-        else return 1;
-      }
+  _initMinheap(size: number): PriorityQueue<BestFirstCell> {
+    let comparingFunction = (a: BestFirstCell, b: BestFirstCell) => {
+      if (a.hCost < b.hCost) return 1;
+      else if (a.hCost > b.hCost) return -1;
+      else return 0;
     };
 
-    let equalFunction = (a: AStarCell, b: AStarCell) =>
+    let equalFunction = (a: BestFirstCell, b: BestFirstCell) =>
       a.row === b.row && a.col === b.col;
-    let pq = new PriorityQueue<AStarCell>(
+    let pq = new PriorityQueue<BestFirstCell>(
       size,
       comparingFunction,
       equalFunction
@@ -187,28 +165,26 @@ export class AStar extends PathFinder {
 
   // getting the distance between two cells with the heuristic. we can move diagonally with cost of 14 and left right up or down with cost of 10 like a triangle
   _getEstimatedDistanceBetweenTwoCells(
-    firstCell: AStarCell,
-    secondCell: AStarCell
+    firstCell: BestFirstCell,
+    secondCell: BestFirstCell
   ): number {
     let distanceX = firstCell.row - secondCell.row;
     let distanceY = firstCell.col - secondCell.col;
     return Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
   }
   // creating the hashmap that we will work with
-  _createAStarHashmap(): AStarHashmap {
+  _createBestFirstHashmap(): BestFirstHashmap {
     let cellHashmap = this.cellHashmap();
-    let result: AStarHashmap = {};
+    let result: BestFirstHashmap = {};
     for (let entry of Object.entries(cellHashmap)) {
-      let aStarCell: AStarCell = {
-        gCost: Infinity,
+      let bestFirstCell: BestFirstCell = {
         hCost: Infinity,
-        fCost: Infinity,
         type: entry[1].state.type,
         row: entry[1].props.row,
         col: entry[1].props.col,
         parent: null,
       };
-      result[entry[0]] = aStarCell;
+      result[entry[0]] = bestFirstCell;
     }
     return result;
   }

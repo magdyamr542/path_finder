@@ -22,7 +22,7 @@ export class PathFinder {
   rows: number;
   cols: number;
   _stopAnimatingPath: boolean = false;
-  _animateResultSpeed: number = 20;
+  _animateResultSpeed: number = 10;
   constructor(cellHashmap: CellHashMap, rows: number, cols: number) {
     this._cellHashMap = cellHashmap;
     this.rows = rows - 1; // the mapping is from 0 to rows - 1

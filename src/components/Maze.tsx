@@ -6,6 +6,7 @@ import { generateClassNameForCell } from "../utils/utils";
 import { DFS } from "../algos/dfs";
 import { BFS } from "../algos/bfs";
 import { AStar } from "../algos/AStar";
+import { BestFirst } from "../algos/bestFirst";
 import { BidirectionalBFS } from "../algos/BidirectionalBfs";
 import "../styles/Maze.css";
 
@@ -25,6 +26,7 @@ export class Maze extends Component<Props, State> {
   bfs: BFS;
   bidirectionalBfs: BidirectionalBFS;
   aStar: AStar;
+  bestFirst: BestFirst;
 
   mouseEvents: MouseEvents = {
     down: false,
@@ -49,6 +51,12 @@ export class Maze extends Component<Props, State> {
       props.columnsNumber
     );
     this.aStar = new AStar(
+      this.cellHashMap,
+      props.rowsNumber,
+      props.columnsNumber
+    );
+
+    this.bestFirst = new BestFirst(
       this.cellHashMap,
       props.rowsNumber,
       props.columnsNumber
@@ -224,6 +232,19 @@ export class Maze extends Component<Props, State> {
         "Please make sure to start one Start Cell and One Target Cell"
       );
   };
+
+  startBestFirstSearch = () => {
+    this.bestFirst.cellHashmap(this.cellHashMap);
+    let isReady: boolean = this.bestFirst.checkIfReadyToPerformPathFinding(); // it is ready if we have only one target and one start node
+    if (isReady) {
+      let found = this.bestFirst.findShortestPath();
+      if (found) console.log("Found");
+      else console.log("Didnt find");
+    } else
+      console.error(
+        "Please make sure to start one Start Cell and One Target Cell"
+      );
+  };
   // foreach cell in each row draw a cell component
   render() {
     let { rows } = this.state;
@@ -276,6 +297,13 @@ export class Maze extends Component<Props, State> {
 
             <button onClick={this.startAStar} className="button aStar">
               A*
+            </button>
+
+            <button
+              onClick={this.startBestFirstSearch}
+              className="button bestFirst"
+            >
+              Best First
             </button>
           </div>
           <div className="mazeContainer">

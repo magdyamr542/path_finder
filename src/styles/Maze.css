@@ -104,6 +104,22 @@ button.aStar:hover {
     color: white;
 }
 
+
+
+button.bestFirst {
+    background-color: white;
+    color: black;
+    border: 2px solid;
+    font-size: 20px;
+
+}
+
+button.bestFirst:hover {
+    background-color: purple;
+    color: white;
+}
+
+
 .button-container-pick {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -112,8 +128,8 @@ button.aStar:hover {
 
 .button-container-search {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    margin: 0 20%;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    margin: 0 10%;
 }
 
 
