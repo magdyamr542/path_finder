@@ -49,16 +49,6 @@ export class AStar extends PathFinder {
     );
     // this.constructShortestPath(aStarHashmap, startCell, targetCell);
   }
-  constructShortestPath(startCell: AStarCell, targetCell: AStarCell) {
-    let current = targetCell;
-    let path: AStarCell[] = [];
-    while (current !== startCell) {
-      current.type = CellType.aStarShortestPath;
-      path.push(Object.assign({}, current));
-      current = current.parent;
-    }
-    return path;
-  }
 
   // finding the shortest path between two nodes using the A* Algorithm
   findShortestPathUtil(
