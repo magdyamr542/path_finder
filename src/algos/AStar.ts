@@ -1,11 +1,7 @@
 import { CellType } from "../enums/enums";
-import { PathFinder, PathFinderCell, PathFinderResult } from "./pathFinder";
-import { CellHashMap } from "../interfaces/Maze.interface";
-import { Cell } from "../components/Cell";
+import { PathFinder } from "./pathFinder";
 import { PriorityQueue } from "../datastructures/priorityQueue";
-import { start } from "repl";
 import { generateClassNameForCell } from "../utils/utils";
-import { equal } from "assert";
 
 interface AStarCell {
   gCost: number;
@@ -38,34 +34,36 @@ export class AStar extends PathFinder {
       aStarHashmap,
       result
     );
-    // this.animate(
-    //   result.map((e) => {
-    //     return { row: e.row, col: e.col, type: e.type, parent: e.parent };
-    //   }),
-    //   false
-    // );
-    this.constructShortestPath(aStarHashmap, startCell, targetCell);
+    let shortestPath = this.constructShortestPath(startCell, targetCell);
+    this.visualisePath(result, shortestPath, found);
     return found;
   }
 
-  constructShortestPath(
-    hashmap: AStarHashmap,
-    startCell: AStarCell,
-    targetCell: AStarCell
+  visualisePath(
+    result: AStarCell[],
+    shortestPath: AStarCell[],
+    found: boolean
   ) {
-    console.log(hashmap);
-    let current = targetCell;
-    let path = [];
-    while (current !== startCell) {
-      path.push(current);
-      current = current.parent;
-    }
+    result[0].type = CellType.start;
+    shortestPath[0].type = CellType.target;
     this.animate(
-      path.map((e) => {
+      result.map((e) => {
         return { row: e.row, col: e.col, type: e.type, parent: e.parent };
       }),
-      false
+      found,
+      shortestPath
     );
+    // this.constructShortestPath(aStarHashmap, startCell, targetCell);
+  }
+  constructShortestPath(startCell: AStarCell, targetCell: AStarCell) {
+    let current = targetCell;
+    let path: AStarCell[] = [];
+    while (current !== startCell) {
+      current.type = CellType.aStarShortestPath;
+      path.push(Object.assign({}, current));
+      current = current.parent;
+    }
+    return path;
   }
 
   // finding the shortest path between two nodes using the A* Algorithm
@@ -106,6 +104,8 @@ export class AStar extends PathFinder {
           { row: targetCell.row, col: targetCell.col }
         )
       ) {
+        minCell.type = CellType.target;
+        result.push(minCell);
         return true;
       }
 
@@ -197,10 +197,14 @@ export class AStar extends PathFinder {
     firstCell: AStarCell,
     secondCell: AStarCell
   ): number {
-    let distanceX = Math.abs(firstCell.row - secondCell.col);
+    let distanceX = Math.abs(firstCell.row - secondCell.row);
     let distanceY = Math.abs(firstCell.col - secondCell.col);
     return (
-      14 * Math.min(distanceX, distanceY) + 10 * Math.abs(distanceX - distanceY)
+      7 * Math.min(distanceX, distanceY) +
+      10 *
+        Math.abs(
+          Math.max(distanceY, distanceX) - Math.min(distanceY, distanceX)
+        )
     );
   }
   // creating the hashmap that we will work with

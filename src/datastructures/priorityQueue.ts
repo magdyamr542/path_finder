@@ -16,7 +16,7 @@ export class PriorityQueue<T> {
   }
 
   isEmpty() {
-    return this.length == 0;
+    return this.length === 0;
   }
 
   // getting the parent and childs
@@ -118,7 +118,7 @@ export class PriorityQueue<T> {
     );
 
     // if didnt find the element
-    if (indexOfElement == -1) {
+    if (indexOfElement === -1) {
       throw Error(
         "There is no such element. how can you change its priority!!"
       );

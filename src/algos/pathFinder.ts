@@ -22,7 +22,7 @@ export class PathFinder {
   rows: number;
   cols: number;
   _stopAnimatingPath: boolean = false;
-  _animateResultSpeed: number = 25;
+  _animateResultSpeed: number = 15;
   constructor(cellHashmap: CellHashMap, rows: number, cols: number) {
     this._cellHashMap = cellHashmap;
     this.rows = rows - 1; // the mapping is from 0 to rows - 1
@@ -38,7 +38,11 @@ export class PathFinder {
     return this;
   }
 
-  animate = (result: PathFinderResult[], targetFound: boolean) => {
+  animate = (
+    result: PathFinderResult[],
+    targetFound: boolean,
+    _actualPath?: PathFinderResult[]
+  ) => {
     let resultWithoutStartOrTarget = result.filter(
       (c) => c.type !== CellType.start && c.type !== CellType.target
     );
@@ -48,7 +52,7 @@ export class PathFinder {
       this.animateResultSpeed()
     ).then((res) => {
       if (targetFound) {
-        let actualPath = this.constructActualPath(result);
+        let actualPath = _actualPath || this.constructActualPath(result);
         this.animateResult(
           actualPath,
           this.cellHashmap(),
