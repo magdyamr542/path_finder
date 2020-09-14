@@ -3,9 +3,16 @@ export class PriorityQueue<T> {
   _elements: T[] = [];
   length: number = 0;
   _comparingFunc: (a: T, b: T) => number;
-  constructor(maxSize: number, comparingFunc: (a: T, b: T) => number) {
+  _equalFunction: (a: T, b: T) => boolean = (a: T, b: T) => a === b;
+
+  constructor(
+    maxSize: number,
+    comparingFunc: (a: T, b: T) => number,
+    equalFunc?: (a: T, b: T) => boolean
+  ) {
     this._size = maxSize;
     this._comparingFunc = comparingFunc;
+    this._equalFunction = equalFunc;
   }
 
   isEmpty() {
@@ -106,8 +113,8 @@ export class PriorityQueue<T> {
 
   // change the priority of an element
   changePriority(element: T, newPriority: T) {
-    let indexOfElement = this._elements.findIndex(
-      (elem, i) => elem === element
+    let indexOfElement = this._elements.findIndex((elem, i) =>
+      this._equalFunction(element, elem)
     );
 
     // if didnt find the element

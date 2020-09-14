@@ -14,6 +14,8 @@ export enum CellType {
   bfsPath = "bfsPath",
   actualPath = "actualPath",
   bfsConnect = "bfsConnect",
+  aStarVisited = "aStarVisited",
+  aStarVisiting = "aStarVisiting",
 }
 
 export enum CellColor {
@@ -26,6 +28,8 @@ export enum CellColor {
   bfsPath = "yellow",
   actualPath = "pink",
   bfsConnect = "pink",
+  aStarVisited = "purple",
+  aStarVisiting = "black",
 }
 
 export enum CellPickingMode {

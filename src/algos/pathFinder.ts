@@ -220,7 +220,10 @@ export class PathFinder {
     cell.type = CellType.visited;
   };
 
-  isEqual = (cell: PathFinderCell, anotherCell: PathFinderCell) => {
+  isEqual = (
+    cell: { row: number; col: number },
+    anotherCell: { row: number; col: number }
+  ) => {
     return cell.col === anotherCell.col && cell.row === anotherCell.row;
   };
 

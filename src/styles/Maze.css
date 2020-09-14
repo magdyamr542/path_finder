@@ -90,6 +90,20 @@ button.bd-bfs:hover {
     color: white;
 }
 
+
+button.aStar {
+    background-color: white;
+    color: black;
+    border: 2px solid;
+    font-size: 20px;
+
+}
+
+button.aStar:hover {
+    background-color: #85144b;
+    color: white;
+}
+
 .button-container-pick {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -98,7 +112,7 @@ button.bd-bfs:hover {
 
 .button-container-search {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     margin: 0 20%;
 }
 

@@ -5,7 +5,7 @@ import { MouseStatus, CellPickingMode, CellType } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
 import { DFS } from "../algos/dfs";
 import { BFS } from "../algos/bfs";
-import { PriorityQueue } from "../datastructures/priorityQueue";
+import { AStar } from "../algos/AStar";
 import { BidirectionalBFS } from "../algos/BidirectionalBfs";
 import "../styles/Maze.css";
 
@@ -24,6 +24,7 @@ export class Maze extends Component<Props, State> {
   dfs: DFS;
   bfs: BFS;
   bidirectionalBfs: BidirectionalBFS;
+  aStar: AStar;
 
   mouseEvents: MouseEvents = {
     down: false,
@@ -43,6 +44,11 @@ export class Maze extends Component<Props, State> {
     this.dfs = new DFS(this.cellHashMap, props.rowsNumber, props.columnsNumber);
     this.bfs = new BFS(this.cellHashMap, props.rowsNumber, props.columnsNumber);
     this.bidirectionalBfs = new BidirectionalBFS(
+      this.cellHashMap,
+      props.rowsNumber,
+      props.columnsNumber
+    );
+    this.aStar = new AStar(
       this.cellHashMap,
       props.rowsNumber,
       props.columnsNumber
@@ -193,11 +199,24 @@ export class Maze extends Component<Props, State> {
       );
   };
 
-  StartBidirectionalBFS = () => {
+  startBidirectionalBFS = () => {
     this.bidirectionalBfs.cellHashmap(this.cellHashMap);
     let isReady: boolean = this.bidirectionalBfs.checkIfReadyToPerformPathFinding(); // it is ready if we have only one target and one start node
     if (isReady) {
       let found = this.bidirectionalBfs.bfs();
+      if (found) console.log("Found");
+      else console.log("Didnt find");
+    } else
+      console.error(
+        "Please make sure to start one Start Cell and One Target Cell"
+      );
+  };
+
+  startAStar = () => {
+    this.aStar.cellHashmap(this.cellHashMap);
+    let isReady: boolean = this.aStar.checkIfReadyToPerformPathFinding(); // it is ready if we have only one target and one start node
+    if (isReady) {
+      let found = this.aStar.findShortestPath();
       if (found) console.log("Found");
       else console.log("Didnt find");
     } else
@@ -249,10 +268,14 @@ export class Maze extends Component<Props, State> {
               BFS
             </button>
             <button
-              onClick={this.StartBidirectionalBFS}
+              onClick={this.startBidirectionalBFS}
               className="button bd-bfs"
             >
               Bidirectional BFS
+            </button>
+
+            <button onClick={this.startAStar} className="button aStar">
+              A*
             </button>
           </div>
           <div className="mazeContainer">
