@@ -8,6 +8,7 @@ import { BFS } from "../algos/bfs";
 import { AStar } from "../algos/AStar";
 import { BestFirst } from "../algos/bestFirst";
 import { BidirectionalBFS } from "../algos/BidirectionalBfs";
+
 import "../styles/Maze.css";
 
 interface Props {

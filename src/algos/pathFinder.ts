@@ -2,6 +2,7 @@ import { CellHashMap } from "../interfaces/Maze.interface";
 import { Cell } from "../components/Cell";
 import { CellType } from "../enums/enums";
 import { generateClassNameForCell } from "../utils/utils";
+import { EventEmitter } from "../EventEmitter";
 
 interface PathFinderResultParent {
   row: number;
@@ -23,10 +24,12 @@ export class PathFinder {
   cols: number;
   _stopAnimatingPath: boolean = false;
   _animateResultSpeed: number = 10;
+  eventEmitter: EventEmitter<string>;
   constructor(cellHashmap: CellHashMap, rows: number, cols: number) {
     this._cellHashMap = cellHashmap;
     this.rows = rows - 1; // the mapping is from 0 to rows - 1
     this.cols = cols - 1;
+    this.eventEmitter = new EventEmitter<string>();
   }
 
   // getting and setting the set hash map
