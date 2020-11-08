@@ -49,20 +49,14 @@ export class PathFinder {
     let resultWithoutStartOrTarget = result.filter(
       (c) => c.type !== CellType.start && c.type !== CellType.target
     );
-    this.animateResult(
-      resultWithoutStartOrTarget,
-      this.cellHashmap(),
-      this.animateResultSpeed()
-    ).then((res) => {
-      if (targetFound) {
-        let actualPath = _actualPath || this.constructActualPath(result);
-        this.animateResult(
-          actualPath,
-          this.cellHashmap(),
-          this.animateResultSpeed()
-        );
+    this.animateResult(resultWithoutStartOrTarget, this.cellHashmap()).then(
+      (res) => {
+        if (targetFound) {
+          let actualPath = _actualPath || this.constructActualPath(result);
+          this.animateResult(actualPath, this.cellHashmap());
+        }
       }
-    });
+    );
   };
 
   constructActualPath = (
@@ -146,8 +140,7 @@ export class PathFinder {
   // animating a result array where the start and the target are not included
   animateResult = (
     result: PathFinderResult[],
-    cellHashmap: CellHashMap,
-    animataResultSpeed: number
+    cellHashmap: CellHashMap
   ): Promise<number> => {
     return new Promise<number>((resolve, reject) => {
       for (let i = 0; i < result.length; i++) {
@@ -158,7 +151,7 @@ export class PathFinder {
         setTimeout(() => {
           actualCell.setState({ type: cell.type });
           if (i === result.length - 1) resolve(1);
-        }, i * animataResultSpeed);
+        }, i * this.animateResultSpeed());
       }
     });
   };
@@ -261,6 +254,7 @@ export class PathFinder {
   animateResultSpeed(speed: number): this;
   animateResultSpeed(): number;
   animateResultSpeed(speed?: number): this | number {
+    console.log("speed is ", speed);
     if (!arguments.length) return this._animateResultSpeed;
     this._animateResultSpeed = speed!;
     return this;

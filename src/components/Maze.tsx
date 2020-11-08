@@ -62,6 +62,31 @@ export class Maze extends Component<Props, State> {
       props.rowsNumber,
       props.columnsNumber
     );
+
+    /* bad solution but whatever */
+    this._listenForSpeedChanges();
+  }
+
+  private _listenForSpeedChanges() {
+    this.dfs.eventEmitter.on("speed_changed", (speed: string) => {
+      this.dfs.animateResultSpeed(parseInt(speed));
+    });
+
+    this.bfs.eventEmitter.on("speed_changed", (speed: string) => {
+      this.bfs.animateResultSpeed(parseInt(speed));
+    });
+
+    this.aStar.eventEmitter.on("speed_changed", (speed: string) => {
+      this.aStar.animateResultSpeed(parseInt(speed));
+    });
+
+    this.bidirectionalBfs.eventEmitter.on("speed_changed", (speed: string) => {
+      this.bidirectionalBfs.animateResultSpeed(parseInt(speed));
+    });
+
+    this.bestFirst.eventEmitter.on("speed_changed", (speed: string) => {
+      this.bestFirst.animateResultSpeed(parseInt(speed));
+    });
   }
 
   // generating the cells
@@ -246,6 +271,20 @@ export class Maze extends Component<Props, State> {
         "Please make sure to start one Start Cell and One Target Cell"
       );
   };
+
+  handleSpeedSliderChange() {
+    const slider = document.querySelector("#myRange");
+    const speed = (slider as HTMLInputElement).value;
+    // handle all listeners to emit the speed
+    this._notifyAllListenersAboutTheSpeed(speed);
+  }
+  private _notifyAllListenersAboutTheSpeed(speed: string) {
+    this.dfs.eventEmitter.emit("speed_changed", speed);
+    this.bfs.eventEmitter.emit("speed_changed", speed);
+    this.aStar.eventEmitter.emit("speed_changed", speed);
+    this.bestFirst.eventEmitter.emit("speed_changed", speed);
+    this.bidirectionalBfs.eventEmitter.emit("speed_changed", speed);
+  }
   // foreach cell in each row draw a cell component
   render() {
     let { rows } = this.state;
@@ -307,6 +346,21 @@ export class Maze extends Component<Props, State> {
               Best First
             </button>
           </div>
+
+          {/* speed slider */}
+
+          <div className="slidecontainer">
+            <input
+              type="range"
+              min="1"
+              max="20"
+              className="slider"
+              id="myRange"
+              onChange={() => this.handleSpeedSliderChange()}
+              defaultValue="10"
+            />
+          </div>
+
           <div className="mazeContainer">
             {rows.map((row: Cell[], i: number) => {
               return (
