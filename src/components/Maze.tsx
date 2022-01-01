@@ -350,6 +350,7 @@ export class Maze extends Component<Props, State> {
           {/* speed slider */}
 
           <div className="slidecontainer">
+          <h3> Visualization Speed ( go left to make it faster ) </h3>
             <input
               type="range"
               min="1"
